@@ -14,14 +14,12 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white54,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               Text(
                 'Settings',
                 style: Theme.of(context).textTheme.headlineLarge,
@@ -86,8 +84,8 @@ class _SettingsViewState extends State<SettingsView> {
             ],
           ),
         ),
-      ),
-    );
+      );
+
   }
 
   Widget _buildSettingSection({
