@@ -22,28 +22,31 @@ class _ContentViewState extends State<ContentView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:EdgeInsets.symmetric(vertical: 10, horizontal: 10) ,
-      child: FutureBuilder<List<Coin>>(
-        future: _coinsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No coins found'));
-          } else {
-            final coins = snapshot.data!;
-            return ListView.builder(
-              itemCount: coins.length,
-              itemBuilder: (context, index) {
-                final coin = coins[index];
-                return CoinTile(coin: coin);
-              },
-            );
-          }
-        },
+    return Container(
+      color: Colors.white54,
+      child: Padding(
+        padding:EdgeInsets.symmetric(vertical: 10, horizontal: 10) ,
+        child: FutureBuilder<List<Coin>>(
+          future: _coinsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No coins found'));
+            } else {
+              final coins = snapshot.data!;
+              return ListView.builder(
+                itemCount: coins.length,
+                itemBuilder: (context, index) {
+                  final coin = coins[index];
+                  return CoinTile(coin: coin);
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }

@@ -51,12 +51,14 @@ flutter pub get
 flutter run -d windows   # or -d macos / -d linux
 ```
 ### Usage
-	-Launch the app
-	-Navigate using the sidebar or drawer
-	-See live crypto prices fetched from CoinGecko
-	-Expandable to add portfolio management and history
+- Launch the app	
+- Navigate using the sidebar or drawer
+- See live crypto prices fetched from CoinGecko
+- Expandable to add portfolio management and history
+
 
 ### Project Structure 
+```
 lib/
 ├── core/
 │    └── network/coin_service.dart  # API requests
@@ -66,13 +68,15 @@ lib/
 ├── presentation/
 │    └── pages/content_view.dart
 └── main.dart
+```
 
 ### Future Plans
-	•	Add Isar caching for offline data
-	•	Implement user portfolio with add/remove assets
-	•	Real-time price updates
-	•	Dark/light theme support
-	•	Filtering and sorting coins
+- Add Isar caching for offline data
+- Implement user portfolio with add/remove assets
+- Real-time price updates
+- Dark/light theme support
+- Filtering and sorting coins
+
 ### License
 MIT License © Kovalev Maksim
 --- 
