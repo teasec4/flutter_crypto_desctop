@@ -1,4 +1,4 @@
-import 'package:crypto_desctop/presentation/pages/content_view.dart';
+import 'package:crypto_desctop/presentation/pages/content_page.dart';
 import 'package:crypto_desctop/presentation/pages/settings_view.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Crypto Desctop App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade300),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey.shade600),
       ),
       home: const HomePage(),
     );
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
       case 2:
         return SettingsView();
       default:
-        return const ContentView();
+        return const ContentPage();
     }
   }
 }
