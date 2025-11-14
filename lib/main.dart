@@ -140,18 +140,7 @@ class _HomePageState extends State<HomePage> {
             ),
 
           // Main content
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              transitionBuilder: (child, animation) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              child: KeyedSubtree(
-                key: ValueKey(selectedIndex),
-                child: widget.child,
-              ),
-            ),
-          ),
+          Expanded(child: widget.child),
         ],
       ),
     );

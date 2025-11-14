@@ -1,6 +1,7 @@
 import 'package:crypto_desctop/presentation/pages/coin_detail_page.dart';
 import 'package:crypto_desctop/presentation/pages/content_page.dart';
 import 'package:crypto_desctop/main.dart';
+import 'package:crypto_desctop/presentation/pages/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,7 +25,7 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/settings',
           pageBuilder: (context, state) => const NoTransitionPage(
-            child: Center(child: Text("Settings Page")),
+            child: SettingsView(),
           ),
         ),
       ],
