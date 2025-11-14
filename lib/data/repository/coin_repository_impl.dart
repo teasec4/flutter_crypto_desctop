@@ -1,65 +1,49 @@
-import 'package:crypto_desctop/core/network/coin_service.dart';
-import 'package:crypto_desctop/data/models/isar_coin_model.dart';
+import 'package:crypto_desctop/data/datasource/coin_local_datasource.dart';
+import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
-import 'package:isar/isar.dart';
 
+/// Repository pattern: координирует работу локального и удаленного источников
 class CoinRepositoryImpl implements CoinRepo {
-  final CoinService coinService;
-  final Isar isar;
+  final CoinRemoteDatasource remoteDatasource;
+  final CoinLocalDatasource localDatasource;
 
-  CoinRepositoryImpl({required this.coinService, required this.isar});
+  CoinRepositoryImpl({
+    required this.remoteDatasource,
+    required this.localDatasource,
+  });
 
   @override
   Future<List<Coin>> getCoins() async {
-    // 1. Сразу вернуть из кеша (если есть)
-    List<Coin> cachedCoins = [];
-    try {
-      final items = isar.isarCoins.where().findAllSync();
-      cachedCoins = items.map((e) => e.toDomain()).toList();
-    } catch (_) {
-      // Если БД еще не инициализирована или пуста
-    }
+    // 1. Вернуть кеш сразу
+    final cachedCoins = await localDatasource.getCachedCoins();
 
-    // 2. Параллельно обновить с сети
+    // 2. Обновить из сети
     try {
-      final networkCoins = await coinService.getCoins();
-      
-      // Сохранить в БД
-      await isar.writeTxn(() async {
-        await isar.isarCoins.clear();
-        await isar.isarCoins.putAll(
-          networkCoins.map((c) => IsarCoin.fromDomain(c)).toList(),
-        );
-      });
-      
+      final networkCoins = await remoteDatasource.getCoins();
+      await localDatasource.cacheCoins(networkCoins);
       return networkCoins;
     } catch (e) {
       // Если ошибка сети, вернуть кеш
       if (cachedCoins.isNotEmpty) {
         return cachedCoins;
       }
-      rethrow; // Если кеша тоже нет, пробросить ошибку
+      rethrow;
     }
   }
 
   @override
   Future<Coin> getCoin(String id) async {
-    // Аналогично для одной монеты
-    try {
-      final cached = isar.isarCoins.filter().coinIdEqualTo(id).findFirstSync();
-      if (cached != null) {
-        return cached.toDomain();
-      }
-    } catch (_) {}
+    // 1. Вернуть из кеша если есть
+    final cached = await localDatasource.getCachedCoin(id);
+    if (cached != null) {
+      return cached;
+    }
 
+    // 2. Загрузить из сети
     try {
-      final coin = await coinService.getCoin(id);
-      
-      await isar.writeTxn(() async {
-        await isar.isarCoins.put(IsarCoin.fromDomain(coin));
-      });
-      
+      final coin = await remoteDatasource.getCoin(id);
+      await localDatasource.cacheCoin(coin);
       return coin;
     } catch (e) {
       rethrow;

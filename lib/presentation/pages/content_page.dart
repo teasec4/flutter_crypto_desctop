@@ -1,4 +1,5 @@
-import 'package:crypto_desctop/core/network/coin_service.dart';
+import 'package:crypto_desctop/data/datasource/coin_local_datasource_impl.dart';
+import 'package:crypto_desctop/data/datasource/coin_remote_datasource_impl.dart';
 import 'package:crypto_desctop/data/repository/coin_repository_impl.dart';
 import 'package:crypto_desctop/main.dart';
 import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
@@ -11,9 +12,12 @@ class ContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dependency injection
+    final localDatasource = CoinLocalDatasourceImpl(isarDb);
+    final remoteDatasource = CoinRemoteDatasourceImpl();
     final coinRepo = CoinRepositoryImpl(
-      coinService: CoinService(),
-      isar: isarDb,
+      localDatasource: localDatasource,
+      remoteDatasource: remoteDatasource,
     );
 
     return BlocProvider(

@@ -1,9 +1,10 @@
 import 'dart:isolate';
 
 import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
+import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 
-class CoinService {
+class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
   SendPort? _workerSendPort;
 
   Future<void> _initializeWorker() async {
@@ -14,16 +15,14 @@ class CoinService {
     _workerSendPort = await receivePort.first as SendPort;
   }
 
+  @override
   Future<List<Coin>> getCoins() async {
     await _initializeWorker();
 
     final receivePort = ReceivePort();
-    const perPage = 20;
-    const page = 1;
-
     _workerSendPort!.send({
-      'page': page,
-      'perPage': perPage,
+      'page': 1,
+      'perPage': 20,
       'sendPort': receivePort.sendPort,
     });
 
@@ -36,6 +35,7 @@ class CoinService {
     return (rawList as List).map((json) => Coin.fromJson(json)).toList();
   }
 
+  @override
   Future<Coin> getCoin(String id) {
     throw UnimplementedError();
   }
