@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   static const primaryColor = Color(0xFF6366F1);
@@ -17,13 +18,17 @@ class AppTheme {
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xFFF5F5F5),
         foregroundColor: primaryColor,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
+       ),
       ),
       navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF5F5F5),
         selectedIconTheme: const IconThemeData(
-          color: Colors.white,
+          color: primaryColor,
           size: 28,
         ),
         unselectedIconTheme: IconThemeData(
@@ -38,7 +43,7 @@ class AppTheme {
           color: Colors.grey.shade600,
           fontWeight: FontWeight.w500,
         ),
-        indicatorColor: primaryColor,
+        indicatorColor: Colors.transparent,
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
@@ -61,7 +66,7 @@ class AppTheme {
         textColor: Colors.black87,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        fillColor: Colors.white,
+        fillColor: const Color(0xFFF5F5F5),
         filled: true,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

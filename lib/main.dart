@@ -1,13 +1,38 @@
+import 'dart:io';
+
 import 'package:crypto_desctop/core/theme/app_theme.dart';
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
+import 'package:crypto_desctop/data/models/isar_coin_model.dart';
 import 'package:crypto_desctop/presentation/pages/content_page.dart';
 import 'package:crypto_desctop/presentation/pages/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:isar/isar.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Инициализировать Isar
+  final dir = Directory('isar_db');
+  if (!dir.existsSync()) {
+    dir.createSync();
+  }
+  
+  final isar = await Isar.open(
+    [IsarCoinSchema],
+    directory: dir.path,
+  );
+  
+  // Сохранить в сервис локатор или в singleton
+  _isarInstance = isar;
+  
   runApp(const MyApp());
 }
+
+late final Isar _isarInstance;
+
+// Getter для доступа к Isar во всем приложении
+Isar get isarDb => _isarInstance;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -110,48 +135,6 @@ class _HomePageState extends State<HomePage> {
       child: SafeArea(
         child: ListView(
           children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.indigo.shade400, Colors.purple.shade500],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.currency_bitcoin,
-                        size: 32,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text(
-                          "Crypto Tracker",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    "v1.0.0",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ),
             ListTile(
               title: const Text("Home"),
               selected: selectedIndex == 0,

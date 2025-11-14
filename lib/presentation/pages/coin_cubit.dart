@@ -1,5 +1,5 @@
-import 'package:crypto_desctop/core/network/coin_service.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
+import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 sealed class CoinState {}
@@ -19,14 +19,14 @@ class CoinError extends CoinState {
 }
 
 class CoinCubit extends Cubit<CoinState> {
-  final CoinService coinService;
+  final CoinRepo coinRepo;
 
-  CoinCubit(this.coinService) : super(CoinInitial());
+  CoinCubit(this.coinRepo) : super(CoinInitial());
 
   Future<void> loadCoins() async {
     try {
       emit(CoinLoading());
-      final coinsList = await coinService.getCoins();
+      final coinsList = await coinRepo.getCoins();
       emit(CoinLoaded(coinsList));
     } catch (e) {
       emit(CoinError(e.toString()));
