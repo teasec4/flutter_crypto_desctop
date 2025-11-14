@@ -1,4 +1,5 @@
 import 'package:crypto_desctop/domain/models/coin.dart';
+import 'package:crypto_desctop/router/app_router.dart';
 import 'package:flutter/material.dart';
 
 class CoinTile extends StatelessWidget {
@@ -64,6 +65,7 @@ class CoinTile extends StatelessWidget {
           ),
         ],
       ),
+      onTap: () => context.goToCoinDetail(coin.id),
     );
   }
 }
