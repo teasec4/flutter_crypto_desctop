@@ -15,10 +15,10 @@ class CoinRepositoryImpl implements CoinRepo {
 
   @override
   Future<List<Coin>> getCoins() async {
-    // 1. Вернуть кеш сразу
+    // 1. cashe
     final cachedCoins = await localDatasource.getCachedCoins();
 
-    // 2. Обновить из сети
+    // 2. update from network
     try {
       final networkCoins = await remoteDatasource.getCoins();
       await localDatasource.cacheCoins(networkCoins);
@@ -34,13 +34,13 @@ class CoinRepositoryImpl implements CoinRepo {
 
   @override
   Future<Coin> getCoin(String id) async {
-    // 1. Вернуть из кеша если есть
+    // 1. cashe if exist
     final cached = await localDatasource.getCachedCoin(id);
     if (cached != null) {
       return cached;
     }
 
-    // 2. Загрузить из сети
+    // 2. upload from network
     try {
       final coin = await remoteDatasource.getCoin(id);
       await localDatasource.cacheCoin(coin);

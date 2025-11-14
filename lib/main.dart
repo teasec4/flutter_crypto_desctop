@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:crypto_desctop/core/theme/app_theme.dart';
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
 import 'package:crypto_desctop/data/models/isar_coin_model.dart';
+import 'package:crypto_desctop/di/service_locator.dart';
 import 'package:crypto_desctop/presentation/pages/content_page.dart';
 import 'package:crypto_desctop/presentation/pages/settings_view.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import 'package:isar/isar.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Инициализировать Isar
+  // init Isar
   final dir = Directory('isar_db');
   if (!dir.existsSync()) {
     dir.createSync();
@@ -24,15 +25,11 @@ void main() async {
   );
   
   // Сохранить в сервис локатор или в singleton
-  _isarInstance = isar;
+  setupServiceLocator(isar);
   
   runApp(const MyApp());
 }
 
-late final Isar _isarInstance;
-
-// Getter для доступа к Isar во всем приложении
-Isar get isarDb => _isarInstance;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
