@@ -9,23 +9,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // init Isar
-  final dir = Directory('isar_db');
-  if (!dir.existsSync()) {
-    dir.createSync();
+  try {
+    // init Isar
+    final dir = await getApplicationDocumentsDirectory();
+    final isarDir = Directory('${dir.path}/isar_db');
+    if (!isarDir.existsSync()) {
+      isarDir.createSync();
+    }
+    
+    final isar = await Isar.open(
+      [IsarCoinSchema],
+      directory: isarDir.path,
+    );
+    
+    setupServiceLocator(isar);
+  } catch (e) {
+    debugPrint('Error initializing app: $e');
   }
-  
-  final isar = await Isar.open(
-    [IsarCoinSchema],
-    directory: dir.path,
-  );
-  
-  // Сохранить в сервис локатор или в singleton
-  setupServiceLocator(isar);
   
   runApp(const MyApp());
 }
