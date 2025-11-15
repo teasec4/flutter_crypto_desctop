@@ -1,16 +1,17 @@
 import 'dart:isolate';
-
 import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 
 class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
+  // from main to worker
   SendPort? _workerSendPort;
 
   Future<void> _initializeWorker() async {
     if (_workerSendPort != null) return;
-
+    // recive port of main Isolate
     final receivePort = ReceivePort();
+    // create a coinWorker and send receivePort
     await Isolate.spawn(coinWorker, receivePort.sendPort);
     _workerSendPort = await receivePort.first as SendPort;
   }

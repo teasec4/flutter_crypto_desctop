@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:crypto_desctop/core/theme/app_theme.dart';
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
 import 'package:crypto_desctop/data/models/isar_coin_model.dart';
+import 'package:crypto_desctop/data/models/isar_user_model.dart';
 import 'package:crypto_desctop/di/service_locator.dart';
 import 'package:crypto_desctop/router/app_router.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ void main() async {
     }
     
     final isar = await Isar.open(
-      [IsarCoinSchema],
+      [IsarCoinSchema, IsarUserSchema],
       directory: isarDir.path,
     );
     

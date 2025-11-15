@@ -4,10 +4,10 @@ import 'dart:isolate';
 import 'package:http/http.dart' as http;
 
 void coinWorker(SendPort mainSendPort) async {
-  final port = ReceivePort();
-  mainSendPort.send(port.sendPort);
+  final workerReceivePort = ReceivePort();
+  mainSendPort.send(workerReceivePort.sendPort);
 
-  await for (final msg in port) {
+  await for (final msg in workerReceivePort) {
     if (msg is Map<String, dynamic>) {
       final int page = msg['page'];
       final int perPage = msg['perPage'];
