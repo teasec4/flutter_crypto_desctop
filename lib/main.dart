@@ -176,33 +176,35 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDrawer(BuildContext context, int selectedIndex) {
     return Drawer(
       child: SafeArea(
-        child: ListView(
-          children: [
-            ListTile(
-              title: const Text("Home"),
-              selected: selectedIndex == 0,
-              onTap: () {
-                context.go(AppConstants.homeRoute);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              title: const Text("Portfolio"),
-              selected: selectedIndex == 1,
-              onTap: () {
-                context.go(AppConstants.portfolioRoute);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              title: const Text("Settings"),
-              selected: selectedIndex == 2,
-              onTap: () {
-                context.go(AppConstants.settingsRoute);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        child: Center(
+          child: ListView(
+            children: [
+              ListTile(
+                title: const Text("Home"),
+                selected: selectedIndex == 0,
+                onTap: () {
+                  context.go(AppConstants.homeRoute);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                title: const Text("Portfolio"),
+                selected: selectedIndex == 1,
+                onTap: () {
+                  context.go(AppConstants.portfolioRoute);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                title: const Text("Settings"),
+                selected: selectedIndex == 2,
+                onTap: () {
+                  context.go(AppConstants.settingsRoute);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
