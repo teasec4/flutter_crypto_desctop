@@ -1,10 +1,12 @@
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
+import 'package:crypto_desctop/core/utils/ui_utils.dart';
 import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+/// Settings view with app preferences, theme options, and account management
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
@@ -49,7 +51,7 @@ class SettingsView extends StatelessWidget {
             },
           ),
 
-          // Currency Section
+          // Currency Section (placeholder for future implementation)
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
             child: _buildSectionTitle(context, 'Currency'),
@@ -87,7 +89,7 @@ class SettingsView extends StatelessWidget {
             trailing: Text('CoinGecko'),
           ),
 
-          // Logout Section
+          // Account Section
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
             child: _buildSectionTitle(context, 'Account'),
@@ -103,6 +105,7 @@ class SettingsView extends StatelessWidget {
     );
   }
 
+  /// Shows a confirmation dialog and handles user logout
   void _handleLogout(BuildContext context) {
     showDialog(
       context: context,
@@ -117,7 +120,7 @@ class SettingsView extends StatelessWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-              // Clear portfolio state before logout
+              // Clear portfolio state before logout (portfolio data persists on server)
               if (context.mounted) {
                 context.read<PortfolioCubit>().clear();
               }
@@ -133,22 +136,14 @@ class SettingsView extends StatelessWidget {
     );
   }
 
-  Color _getSecondaryTextColor(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (isDark) {
-      return Colors.grey.shade400;
-    } else {
-      return Colors.grey.shade700;
-    }
-  }
-
+  /// Builds a section header with title text
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: _getSecondaryTextColor(context),
-          ),
+        fontWeight: FontWeight.w600,
+        color: UIUtils.getSecondaryTextColor(context),
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:crypto_desctop/core/utils/ui_utils.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
@@ -5,29 +6,17 @@ import 'package:crypto_desctop/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// A list tile widget that displays a cryptocurrency coin with its price and market info
 class CoinTile extends StatelessWidget {
   final Coin coin;
 
   const CoinTile({super.key, required this.coin});
 
-  String _getRankString(int rank) {
-    if (rank == 0) return '';
-    return '$rank';
-  }
-
-  Color _getSecondaryTextColor(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (isDark) {
-      return Colors.grey.shade400;
-    } else {
-      return Colors.grey.shade700;
-    }
-  }
-
+  /// Shows a modal bottom sheet for adding this coin to the user's portfolio
   void _showAddToPortfolioModal(BuildContext context) {
     final portfolioCubit = context.read<PortfolioCubit>();
     final authCubit = context.read<AuthCubit>();
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -45,15 +34,17 @@ class CoinTile extends StatelessWidget {
       leading: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Market cap rank
           Text(
-            _getRankString(coin.marketCapRank),
+            UIUtils.formatRank(coin.marketCapRank),
             style: TextStyle(
               fontSize: 12,
-              color: _getSecondaryTextColor(context),
+              color: UIUtils.getSecondaryTextColor(context),
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(width: 8),
+          // Coin icon/image
           Image.network(
             coin.imageUrl,
             width: 20,
@@ -62,31 +53,36 @@ class CoinTile extends StatelessWidget {
           ),
         ],
       ),
+      // Coin name
       title: Text(
         coin.name,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
+      // Coin symbol
       subtitle: Text(
         coin.symbol.toUpperCase(),
         style: TextStyle(
-          color: _getSecondaryTextColor(context),
+          color: UIUtils.getSecondaryTextColor(context),
           fontWeight: FontWeight.w600,
         ),
       ),
       trailing: SizedBox(
         width: 140,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Price and 24h change
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  // Current price
                   Text(
                     '\$${coin.price.toStringAsFixed(2)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
+                  // 24 hour price change percentage
                   Text(
                     '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
                     style: TextStyle(
@@ -100,21 +96,24 @@ class CoinTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            // Add to portfolio button
             IconButton(
               iconSize: 20,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.add_circle_outline),
+              icon: const Icon(Icons.add_sharp),
               onPressed: () => _showAddToPortfolioModal(context),
             ),
           ],
         ),
       ),
+      // Navigate to coin detail page on tap
       onTap: () => context.goToCoinDetail(coin.id),
     );
   }
 }
 
+/// Modal bottom sheet for adding a coin to the portfolio
 class _AddToPortfolioSheet extends StatefulWidget {
   final Coin coin;
   final PortfolioCubit portfolioCubit;
@@ -147,6 +146,7 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
     super.dispose();
   }
 
+  /// Handles the addition of the coin to the user's portfolio
   void _handleAddToPortfolio() {
     if (_formKey.currentState?.validate() ?? false) {
       final amount = double.parse(_amountController.text);
@@ -154,9 +154,9 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
       setState(() => _isLoading = true);
 
       try {
-        // Get current user email
+        // Get current user email from auth cubit
         final userEmail = widget.authCubit.getCurrentUserEmail();
-        
+
         if (userEmail == null) {
           setState(() => _isLoading = false);
           if (mounted) {
@@ -167,37 +167,38 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
           return;
         }
 
-        // Initialize portfolio cubit with user email if needed
+        // Initialize portfolio cubit with user email
         widget.portfolioCubit.initializeUser(userEmail);
 
-        widget.portfolioCubit.addAsset(widget.coin.symbol, amount).then(
-        (_) {
-          if (mounted) {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${widget.coin.symbol.toUpperCase()} added to portfolio',
-                ),
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          }
-        },
-      ).onError((error, stackTrace) {
-        setState(() => _isLoading = false);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${error.toString()}')),
-          );
-        }
-      });
+        widget.portfolioCubit
+            .addAsset(widget.coin.symbol, amount)
+            .then((_) {
+              if (mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${widget.coin.symbol.toUpperCase()} added to portfolio',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            })
+            .onError((error, stackTrace) {
+              setState(() => _isLoading = false);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: ${error.toString()}')),
+                );
+              }
+            });
       } catch (e) {
         setState(() => _isLoading = false);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
         }
       }
     }
@@ -227,6 +228,7 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
                 ),
                 child: Row(
                   children: [
+                    // Coin icon
                     Image.network(
                       widget.coin.imageUrl,
                       width: 40,
@@ -235,24 +237,19 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
                           const Icon(Icons.error, size: 40),
                     ),
                     const SizedBox(width: 12),
+                    // Coin name and symbol
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.coin.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
                             widget.coin.symbol.toUpperCase(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(context).colorScheme.outline,
                                 ),
@@ -260,17 +257,14 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
                         ],
                       ),
                     ),
+                    // Current price and change
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
                           '\$${widget.coin.price.toStringAsFixed(2)}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${widget.coin.priceChangePercentage24H.toStringAsFixed(2)}%',
@@ -292,8 +286,9 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
               // Amount input field
               TextFormField(
                 controller: _amountController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 autovalidateMode: AutovalidateMode.onUnfocus,
                 decoration: InputDecoration(
                   labelText: 'Amount',
@@ -320,8 +315,8 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
                 },
               ),
               const SizedBox(height: 8),
-              
-              // Price preview
+
+              // Real-time total value preview
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
@@ -337,15 +332,13 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
                         final amount = double.tryParse(value.text) ?? 0;
                         final totalValue = amount * widget.coin.price;
                         return Text(
-                           '\$${totalValue.toStringAsFixed(2)}',
-                           style: Theme.of(context)
-                               .textTheme
-                               .bodySmall
-                               ?.copyWith(
-                                 fontWeight: FontWeight.bold,
-                                 color: Colors.green.shade500,
-                               ),
-                         );
+                          '\$${totalValue.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade500,
+                              ),
+                        );
                       },
                     ),
                   ],
@@ -353,7 +346,7 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Add button
+              // Submit button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
