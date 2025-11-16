@@ -12,8 +12,7 @@ class CoinDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CoinDetailCubit(getIt<CoinRepo>())
-          ..loadCoin(coinId),
+      create: (context) => CoinDetailCubit(getIt<CoinRepo>())..loadCoin(coinId),
       child: const CoinDetailView(),
     );
   }
@@ -36,7 +35,11 @@ class CoinDetailView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red.shade400,
+                    ),
                     const SizedBox(height: 16),
                     Text('Error: ${state.message}'),
                   ],
@@ -66,7 +69,7 @@ class CoinDetailView extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 24),
-        
+
                       // Coin image and basic info
                       Center(
                         child: Column(
@@ -87,7 +90,7 @@ class CoinDetailView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
-        
+
                       // Price section
                       Card(
                         child: Padding(
@@ -102,14 +105,16 @@ class CoinDetailView extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 '\$${coin.price.toStringAsFixed(2)}',
-                                style: Theme.of(context).textTheme.headlineSmall,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall,
                               ),
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
-        
+
                       // 24h change
                       Card(
                         child: Padding(
@@ -122,7 +127,9 @@ class CoinDetailView extends StatelessWidget {
                                 children: [
                                   Text(
                                     '24h Change',
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -130,8 +137,8 @@ class CoinDetailView extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: coin.priceChange24H >= 0
-                                          ? Colors.green
-                                          : Colors.red,
+                                          ? Colors.green.shade500
+                                          : Colors.red.shade400,
                                     ),
                                   ),
                                 ],
@@ -141,7 +148,9 @@ class CoinDetailView extends StatelessWidget {
                                 children: [
                                   Text(
                                     '24h Change %',
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -150,8 +159,8 @@ class CoinDetailView extends StatelessWidget {
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: coin.priceChangePercentage24H >= 0
-                                          ? Colors.green
-                                          : Colors.red,
+                                          ? Colors.green.shade500
+                                          : Colors.red.shade400,
                                     ),
                                   ),
                                 ],
@@ -161,7 +170,7 @@ class CoinDetailView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-        
+
                       // Market rank
                       if (coin.marketCapRank > 0)
                         Card(
@@ -172,12 +181,16 @@ class CoinDetailView extends StatelessWidget {
                               children: [
                                 Text(
                                   'Market Cap Rank',
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   '#${coin.marketCapRank}',
-                                  style: Theme.of(context).textTheme.headlineSmall,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineSmall,
                                 ),
                               ],
                             ),

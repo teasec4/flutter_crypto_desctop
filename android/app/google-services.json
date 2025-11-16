@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1036230480420",
+    "project_id": "crypto-desktop",
+    "storage_bucket": "crypto-desktop.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036230480420:android:a7b54a0a7367d923337eb1",
+        "android_client_info": {
+          "package_name": "com.example.crypto_desctop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuvjw44tN4rQP0ELe5Cv2PkN-UyxSEbSM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

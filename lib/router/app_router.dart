@@ -1,42 +1,55 @@
+import 'package:crypto_desctop/main.dart';
 import 'package:crypto_desctop/presentation/pages/coin_detail_page.dart';
 import 'package:crypto_desctop/presentation/pages/content_page.dart';
-import 'package:crypto_desctop/main.dart';
+import 'package:crypto_desctop/presentation/pages/login_page.dart';
+import 'package:crypto_desctop/presentation/pages/portfolio_page.dart';
+import 'package:crypto_desctop/presentation/pages/register_page.dart';
 import 'package:crypto_desctop/presentation/pages/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(
+  initialLocation: '/login',
   routes: [
+    // Auth routes
+    GoRoute(
+      path: '/login',
+      pageBuilder: (context, state) => const MaterialPage(child: LoginPage()),
+    ),
+    GoRoute(
+      path: '/register',
+      pageBuilder: (context, state) =>
+          const MaterialPage(child: RegisterPage()),
+    ),
+
+    // Main app routes with shell
     ShellRoute(
       builder: (context, state, child) => HomePage(child: child),
       routes: [
         GoRoute(
           path: '/',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: ContentPage(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: ContentPage()),
         ),
         GoRoute(
           path: '/portfolio',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: Center(child: Text("Portfolio Page")),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: PortfolioPage()),
         ),
         GoRoute(
           path: '/settings',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: SettingsView(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: SettingsView()),
         ),
       ],
     ),
+
+    // Detail routes
     GoRoute(
       path: '/coin/:coinId',
       pageBuilder: (context, state) {
         final coinId = state.pathParameters['coinId']!;
-        return MaterialPage(
-          child: CoinDetailPage(coinId: coinId),
-        );
+        return MaterialPage(child: CoinDetailPage(coinId: coinId));
       },
     ),
   ],

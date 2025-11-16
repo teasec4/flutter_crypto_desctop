@@ -6,7 +6,7 @@ part 'isar_coin_model.g.dart';
 class IsarCoin {
   Id id = Isar.autoIncrement;
 
-  late String coinId;  // domain id
+  late String coinId; // domain id
   late String name;
   late String symbol;
   late double price;
@@ -43,5 +43,4 @@ class IsarCoin {
       priceChangePercentage24H: priceChangePercentage24H,
     );
   }
-
 }

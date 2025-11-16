@@ -1,6 +1,9 @@
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
+import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
+import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -13,19 +16,16 @@ class SettingsView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
           // Notifications Section
-          Padding(padding: const EdgeInsets.only(top: 16,left: 16, bottom: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
             child: _buildSectionTitle(context, 'Notifications'),
           ),
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
             title: const Text('Enable notifications'),
             subtitle: const Text('Get alerts about price changes'),
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-            ),
+            trailing: Switch(value: true, onChanged: (value) {}),
           ),
-
 
           // Appearance Section
           Padding(
@@ -49,7 +49,6 @@ class SettingsView extends StatelessWidget {
             },
           ),
 
-
           // Currency Section
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
@@ -71,7 +70,6 @@ class SettingsView extends StatelessWidget {
             ),
           ),
 
-
           // About Section
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
@@ -88,9 +86,60 @@ class SettingsView extends StatelessWidget {
             title: Text('API'),
             trailing: Text('CoinGecko'),
           ),
+
+          // Logout Section
+          Padding(
+            padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
+            child: _buildSectionTitle(context, 'Account'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
+            subtitle: const Text('Sign out from your account'),
+            onTap: () => _handleLogout(context),
+          ),
         ],
       ),
     );
+  }
+
+  void _handleLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              // Clear portfolio state before logout
+              if (context.mounted) {
+                context.read<PortfolioCubit>().clear();
+              }
+              await context.read<AuthCubit>().logout();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark) {
+      return Colors.grey.shade400;
+    } else {
+      return Colors.grey.shade700;
+    }
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
@@ -98,6 +147,7 @@ class SettingsView extends StatelessWidget {
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
+            color: _getSecondaryTextColor(context),
           ),
     );
   }

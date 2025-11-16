@@ -34,7 +34,7 @@ class CoinRepositoryImpl implements CoinRepo {
 
   @override
   Future<Coin> getCoin(String id) async {
-    // 1. cashe if exist
+    // 1. load cashe if exist
     final cached = await localDatasource.getCachedCoin(id);
     if (cached != null) {
       return cached;
