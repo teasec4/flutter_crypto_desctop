@@ -8,13 +8,12 @@ class CoinDetailCubit extends Cubit<CoinDetailState> {
   final CoinRepo coinRepo;
   CoinDetailCubit(this.coinRepo) : super(CoinDetailLoading());
 
-  Future<void> loadCoin(String coinId) async{
-    try{
+  Future<void> loadCoin(String coinId) async {
+    try {
       emit(CoinDetailLoading());
       final coin = await coinRepo.getCoin(coinId);
       emit(CoinDetailLoaded(coin));
-
-    } catch (e){
+    } catch (e) {
       emit(CoinDetailError(e.toString()));
     }
   }

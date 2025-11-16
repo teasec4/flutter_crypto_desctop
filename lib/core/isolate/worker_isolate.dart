@@ -15,8 +15,8 @@ void coinWorker(SendPort mainSendPort) async {
 
       final url = Uri.parse(
         'https://api.coingecko.com/api/v3/coins/markets'
-            '?vs_currency=usd&order=market_cap_desc'
-            '&per_page=$perPage&page=$page&sparkline=false',
+        '?vs_currency=usd&order=market_cap_desc'
+        '&per_page=$perPage&page=$page&sparkline=false',
       );
 
       try {

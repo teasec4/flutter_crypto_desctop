@@ -23,14 +23,11 @@ class AppTheme {
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarBrightness: Brightness.light,
           statusBarIconBrightness: Brightness.dark,
-       ),
+        ),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: const Color(0xFFF5F5F5),
-        selectedIconTheme: const IconThemeData(
-          color: primaryColor,
-          size: 28,
-        ),
+        selectedIconTheme: const IconThemeData(color: primaryColor, size: 28),
         unselectedIconTheme: IconThemeData(
           color: Colors.grey.shade500,
           size: 24,
@@ -102,14 +99,8 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: Colors.grey.shade800,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade800,
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          color: Colors.grey.shade600,
-        ),
+        bodyLarge: TextStyle(fontSize: 14, color: Colors.grey.shade800),
+        bodySmall: TextStyle(fontSize: 12, color: Colors.grey.shade600),
       ),
     );
   }
@@ -131,10 +122,7 @@ class AppTheme {
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: const Color(0xFF1E293B),
-        selectedIconTheme: const IconThemeData(
-          color: Colors.white,
-          size: 28,
-        ),
+        selectedIconTheme: const IconThemeData(color: Colors.white, size: 28),
         unselectedIconTheme: IconThemeData(
           color: Colors.grey.shade600,
           size: 24,
@@ -206,14 +194,8 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: Colors.grey.shade200,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade300,
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          color: Colors.grey.shade500,
-        ),
+        bodyLarge: TextStyle(fontSize: 14, color: Colors.grey.shade300),
+        bodySmall: TextStyle(fontSize: 12, color: Colors.grey.shade500),
       ),
     );
   }

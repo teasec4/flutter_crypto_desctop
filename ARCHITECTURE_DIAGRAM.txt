@@ -1,0 +1,237 @@
+================================================================================
+                        COMPLETE SYSTEM ARCHITECTURE
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           PRESENTATION LAYER (UI)                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐   │
+│  │   LoginPage      │  │  RegisterPage    │  │   SettingsView (Logout) │   │
+│  │   (login form)   │  │  (register form) │  │   (logout button)       │   │
+│  └────────┬─────────┘  └────────┬─────────┘  └──────────┬───────────────┘   │
+│           │                     │                        │                    │
+│           └──────────┬──────────┴────────────────────────┘                    │
+│                      │                                                        │
+│                      ▼                                                        │
+│            ┌──────────────────┐                                              │
+│            │   AuthCubit      │ (State Management)                           │
+│            │ - login()        │                                              │
+│            │ - register()     │                                              │
+│            │ - logout()       │                                              │
+│            └────────┬─────────┘                                              │
+│                     │                                                        │
+└─────────────────────┼────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DOMAIN LAYER (Business Logic)                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│            ┌────────────────────────────┐                                    │
+│            │  AuthRepository (Interface)│                                    │
+│            │ - login()                  │                                    │
+│            │ - register()               │                                    │
+│            │ - logout()                 │                                    │
+│            │ - isUserLoggedIn()         │                                    │
+│            └────────┬────────────────────┘                                   │
+│                     │                                                        │
+└─────────────────────┼────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DATA LAYER (Implementation)                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│    ┌─────────────────────────────┐                                          │
+│    │  AuthRepositoryImpl          │                                          │
+│    │  - Coordinates Firebase     │                                          │
+│    │    and Isar                 │                                          │
+│    └──────┬──────────────┬────────┘                                         │
+│           │              │                                                   │
+│   ┌───────▼──────┐  ┌────▼─────────────────┐                               │
+│   │  Remote Data │  │   Local Data Source   │                               │
+│   │   Source     │  │   (Isar)              │                               │
+│   │              │  │                       │                               │
+│   │ Firebase     │  │ - saveUser()          │                               │
+│   │ Auth &       │  │ - getUserByEmail()    │                               │
+│   │ Firestore    │  │ - deleteUser()        │                               │
+│   └───────┬──────┘  └────┬─────────────────┘                               │
+│           │              │                                                   │
+└───────────┼──────────────┼───────────────────────────────────────────────────┘
+            │              │
+            │              │
+            ▼              ▼
+    ┌─────────────────┐  ┌──────────────────────┐
+    │   FIREBASE      │  │   ISAR DATABASE      │
+    │   (Remote)      │  │   (Local Cache)      │
+    │                 │  │                      │
+    │ - Authentication│  │ - User profiles      │
+    │ - User Profiles │  │ - Portfolio items    │
+    │ - Portfolio     │  │ - Offline data       │
+    │   Items         │  │                      │
+    └─────────────────┘  └──────────────────────┘
+
+================================================================================
+                           ROUTE PROTECTION LAYER
+================================================================================
+
+                     ┌──────────────────────┐
+                     │   Go Router          │
+                     │   (app_router.dart)  │
+                     └──────────┬───────────┘
+                                │
+                    ┌───────────┴──────────┐
+                    │                      │
+                    ▼                      ▼
+        ┌─────────────────┐      ┌─────────────────┐
+        │ Check Auth      │      │ Public Routes   │
+        │ Status via      │      │ /login          │
+        │ isUserLoggedIn()│      │ /register       │
+        └────────┬────────┘      └─────────────────┘
+                 │
+        ┌────────┴────────┐
+        │                 │
+        ▼                 ▼
+   ┌────────┐        ┌─────────┐
+   │Protected│       │Auth Pages│
+   │Routes   │       │/login   │
+   │/        │       │/register │
+   │/portfolio│       └─────────┘
+   │/settings │
+   └────────┘
+
+    Authenticated? Yes → Allow Access
+    Authenticated? No  → Redirect to /login
+    On Auth Page?      → Redirect to / if authenticated
+
+================================================================================
+                           DATA FLOW DIAGRAM
+================================================================================
+
+REGISTRATION FLOW:
+─────────────────
+
+User Input (email, password, displayName)
+    │
+    ▼
+RegisterPage validates form
+    │
+    ▼
+AuthCubit.register() emits AuthLoading
+    │
+    ▼
+AuthRepository.register()
+    │
+    ├─→ AuthRemoteDataSource.register()
+    │       │
+    │       ├─→ Firebase Auth: createUserWithEmailAndPassword()
+    │       ├─→ Firebase Auth: updateProfile(displayName)
+    │       └─→ Firestore: Save user to users/{email}
+    │
+    └─→ UserLocalDataSource.saveUser()
+            │
+            └─→ Isar: Save user to local database
+    │
+    ▼
+AuthCubit emits AuthSuccess
+    │
+    ▼
+UI navigates to /home
+
+
+LOGIN FLOW:
+──────────
+
+User Input (email, password)
+    │
+    ▼
+LoginPage validates form
+    │
+    ▼
+AuthCubit.login() emits AuthLoading
+    │
+    ▼
+AuthRepository.login()
+    │
+    ├─→ AuthRemoteDataSource.login()
+    │       │
+    │       └─→ Firebase Auth: signInWithEmailAndPassword()
+    │
+    └─→ UserLocalDataSource.saveUser()
+            │
+            └─→ Isar: Cache user locally
+    │
+    ▼
+AuthCubit emits AuthSuccess
+    │
+    ▼
+UI navigates to /home
+
+
+LOGOUT FLOW:
+───────────
+
+User Action: Click Logout in Settings
+    │
+    ▼
+Confirmation Dialog
+    │
+    ▼
+AuthCubit.logout() emits AuthLoading
+    │
+    ▼
+AuthRepository.logout()
+    │
+    ├─→ Get current user
+    ├─→ AuthRemoteDataSource.logout()
+    │       │
+    │       └─→ Firebase Auth: signOut()
+    │
+    └─→ UserLocalDataSource.deleteUser()
+            │
+            └─→ Isar: Remove user from local database
+    │
+    ▼
+AuthCubit emits AuthInitial
+    │
+    ▼
+UI navigates to /login
+
+================================================================================
+                         SECURITY BOUNDARIES
+================================================================================
+
+┌──────────────────────────────────────────────────────────────────┐
+│ CLIENT APPLICATION (Flutter)                                     │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  Handles: Form input, validation, caching, offline support      │
+│  Does NOT: Store passwords, manage tokens (Firebase does)       │
+│                                                                   │
+└──────────────────────────────────────────────────────────────────┘
+                             │
+                     ┌───────┴────────┐
+                     │                │
+                     ▼                ▼
+            ┌──────────────────┐  ┌──────────────────┐
+            │   FIREBASE CORE  │  │  ISAR DATABASE   │
+            │   (Secure)       │  │  (Local)         │
+            │                  │  │                  │
+            │ - Token mgmt     │  │ - Encrypted      │
+            │ - Auth sessions  │  │ - App private    │
+            │ - Secure API     │  │                  │
+            │ - SSL/TLS        │  │                  │
+            └──────────────────┘  └──────────────────┘
+                     │
+                     ▼
+            ┌──────────────────┐
+            │  FIRESTORE API   │
+            │  (Cloud)         │
+            │                  │
+            │ - Secure rules   │
+            │ - Auth required  │
+            │ - Data encrypted │
+            └──────────────────┘
+
+================================================================================

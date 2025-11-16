@@ -1,9 +1,8 @@
-
 import 'package:crypto_desctop/data/models/isar_coin_model.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:isar/isar.dart';
 
-class IsarCoinStorage{
+class IsarCoinStorage {
   final Isar isar;
 
   IsarCoinStorage(this.isar);
