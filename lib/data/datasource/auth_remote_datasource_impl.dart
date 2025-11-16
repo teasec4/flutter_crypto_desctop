@@ -77,10 +77,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return _registerWithRetry(email, password, displayName);
   }
 
-  Future<user_model.User> _loginWithRetry(
-    String email,
-    String password,
-  ) async {
+  Future<user_model.User> _loginWithRetry(String email, String password) async {
     try {
       final response = await _supabase.auth.signInWithPassword(
         email: email,
@@ -93,9 +90,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       developer.log('User logged in successfully: ${supabaseUser.email}');
-      
+
       final createdAt = DateTime.parse(supabaseUser.createdAt);
-      
+
       return user_model.User(
         id: supabaseUser.id,
         email: supabaseUser.email ?? '',

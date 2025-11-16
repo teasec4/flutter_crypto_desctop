@@ -1,3 +1,6 @@
+import 'package:crypto_desctop/core/utils/type_converters.dart';
+
+/// Represents a cryptocurrency coin with market data
 class Coin {
   final String id;
   final String name;
@@ -19,35 +22,23 @@ class Coin {
     required this.priceChangePercentage24H,
   });
 
+  /// Creates a Coin instance from JSON data (CoinGecko API format)
   factory Coin.fromJson(Map<String, dynamic> json) {
     return Coin(
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       symbol: json['symbol'] as String? ?? '',
-      price: _toDouble(json['current_price']),
+      price: TypeConverters.toDouble(json['current_price']),
       imageUrl: json['image'] as String? ?? '',
-      marketCapRank: _toInt(json['market_cap_rank']),
-      priceChange24H: _toDouble(json['price_change_24h']),
-      priceChangePercentage24H: _toDouble(json['price_change_percentage_24h']),
+      marketCapRank: TypeConverters.toInt(json['market_cap_rank']),
+      priceChange24H: TypeConverters.toDouble(json['price_change_24h']),
+      priceChangePercentage24H: TypeConverters.toDouble(
+        json['price_change_percentage_24h'],
+      ),
     );
   }
 
-  static double _toDouble(dynamic value) {
-    if (value == null) return 0.0;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
-  }
-
-  static int _toInt(dynamic value) {
-    if (value == null) return 0;
-    if (value is int) return value;
-    if (value is double) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
-  }
-
+  /// Converts Coin instance to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,

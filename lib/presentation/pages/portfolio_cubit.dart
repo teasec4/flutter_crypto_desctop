@@ -6,13 +6,15 @@ import 'package:flutter/foundation.dart';
 
 part 'portfolio_state.dart';
 
+/// Cubit for managing user cryptocurrency portfolio
+/// Handles portfolio operations: loading, adding, updating, and removing assets
 class PortfolioCubit extends Cubit<PortfolioState> {
   final PortfolioRepository portfolioRepository;
   final CoinRepo coinRepo;
   String? _currentUserEmail;
 
   PortfolioCubit({required this.portfolioRepository, required this.coinRepo})
-      : super(PortfolioInitial());
+    : super(PortfolioInitial());
 
   /// Initialize user email (without loading portfolio)
   void initializeUser(String userEmail) {
@@ -26,10 +28,10 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
     try {
       final items = await portfolioRepository.getPortfolioItems(userEmail);
-      
+
       // Fetch current prices for all portfolio items
       final enrichedItems = await _enrichItemsWithPrices(items);
-      
+
       emit(PortfolioLoaded(enrichedItems));
     } catch (e) {
       emit(PortfolioError('Failed to load portfolio: ${e.toString()}'));
@@ -43,10 +45,12 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     try {
       // Load all coins from repository
       final allCoins = await coinRepo.getCoins();
-      
+
       // Create a map of symbol -> coin for fast lookup
-      final coinMap = {for (var coin in allCoins) coin.symbol.toLowerCase(): coin};
-      
+      final coinMap = {
+        for (var coin in allCoins) coin.symbol.toLowerCase(): coin,
+      };
+
       // Enrich portfolio items with current prices
       return items.map((item) {
         final coin = coinMap[item.symbol.toLowerCase()];

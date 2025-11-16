@@ -22,7 +22,8 @@ void main() async {
     // init Supabase
     await Supabase.initialize(
       url: 'https://bucuwdkctsufqxgspoqw.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1Y3V3ZGtjdHN1ZnF4Z3Nwb3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyNzc3MjUsImV4cCI6MjA3ODg1MzcyNX0.ynPRHsCLH9bvUIwkFRjRZX5ad6ntQwAdvbkJNMyhHaA',
+      anonKey:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1Y3V3ZGtjdHN1ZnF4Z3Nwb3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyNzc3MjUsImV4cCI6MjA3ODg1MzcyNX0.ynPRHsCLH9bvUIwkFRjRZX5ad6ntQwAdvbkJNMyhHaA',
     );
 
     // init Isar
@@ -45,8 +46,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -56,10 +55,8 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => ThemeCubit()),
         BlocProvider(
-          create: (context) => PortfolioCubit(
-            portfolioRepository: getIt(),
-            coinRepo: getIt(),
-          ),
+          create: (context) =>
+              PortfolioCubit(portfolioRepository: getIt(), coinRepo: getIt()),
         ),
         BlocProvider(
           create: (context) {
@@ -176,33 +173,35 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDrawer(BuildContext context, int selectedIndex) {
     return Drawer(
       child: SafeArea(
-        child: ListView(
-          children: [
-            ListTile(
-              title: const Text("Home"),
-              selected: selectedIndex == 0,
-              onTap: () {
-                context.go(AppConstants.homeRoute);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              title: const Text("Portfolio"),
-              selected: selectedIndex == 1,
-              onTap: () {
-                context.go(AppConstants.portfolioRoute);
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              title: const Text("Settings"),
-              selected: selectedIndex == 2,
-              onTap: () {
-                context.go(AppConstants.settingsRoute);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        child: Center(
+          child: ListView(
+            children: [
+              ListTile(
+                title: const Text("Home"),
+                selected: selectedIndex == 0,
+                onTap: () {
+                  context.go(AppConstants.homeRoute);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                title: const Text("Portfolio"),
+                selected: selectedIndex == 1,
+                onTap: () {
+                  context.go(AppConstants.portfolioRoute);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                title: const Text("Settings"),
+                selected: selectedIndex == 2,
+                onTap: () {
+                  context.go(AppConstants.settingsRoute);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

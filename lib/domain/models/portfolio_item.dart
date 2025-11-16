@@ -1,3 +1,6 @@
+import 'package:crypto_desctop/core/utils/type_converters.dart';
+
+/// Represents a cryptocurrency holding in user's portfolio
 class PortfolioItem {
   final String id;
   final String symbol;
@@ -17,32 +20,30 @@ class PortfolioItem {
     this.name,
   });
 
-  /// Total value of this holding in USD
+  /// Calculates the total value of this holding in USD
   double get totalValue => amount * currentPrice;
 
+  /// Creates a PortfolioItem from JSON data
+  /// Handles both camelCase and snake_case keys for flexibility
   factory PortfolioItem.fromJson(Map<String, dynamic> json) {
-    // Handle both camelCase and snake_case keys
     final addedAtValue = json['addedAt'] ?? json['added_at'];
-    
+
     return PortfolioItem(
       id: json['id'] as String? ?? '',
       symbol: (json['symbol'] as String? ?? '').toUpperCase(),
-      amount: _toDouble(json['amount']),
+      amount: TypeConverters.toDouble(json['amount']),
       addedAt: addedAtValue is DateTime
           ? addedAtValue
-          : DateTime.tryParse(addedAtValue is String ? addedAtValue : addedAtValue.toString()) ??
+          : DateTime.tryParse(
+                  addedAtValue is String
+                      ? addedAtValue
+                      : addedAtValue.toString(),
+                ) ??
                 DateTime.now(),
     );
   }
 
-  static double _toDouble(dynamic value) {
-    if (value == null) return 0.0;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
-  }
-
+  /// Converts PortfolioItem to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -52,6 +53,7 @@ class PortfolioItem {
     };
   }
 
+  /// Creates a copy of this PortfolioItem with optional field overrides
   PortfolioItem copyWith({
     String? id,
     String? symbol,

@@ -3,9 +3,11 @@ import 'dart:isolate';
 import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 
+/// Service for fetching cryptocurrency data using isolates for background processing
 class CoinService {
   SendPort? _workerSendPort;
 
+  /// Initializes the worker isolate for background coin fetching
   Future<void> _initializeWorker() async {
     if (_workerSendPort != null) return;
 
@@ -14,6 +16,7 @@ class CoinService {
     _workerSendPort = await receivePort.first as SendPort;
   }
 
+  /// Fetches a list of coins from the CoinGecko API using an isolate
   Future<List<Coin>> getCoins() async {
     await _initializeWorker();
 
@@ -34,9 +37,5 @@ class CoinService {
     }
 
     return (rawList as List).map((json) => Coin.fromJson(json)).toList();
-  }
-
-  Future<Coin> getCoin(String id) {
-    throw UnimplementedError();
   }
 }

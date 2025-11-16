@@ -3,16 +3,20 @@ import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 
+/// Implementation of CoinRemoteDatasource using isolates for background processing
 class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
-  // from main to worker
+  // Send port for communicating with the worker isolate
   SendPort? _workerSendPort;
 
+  /// Initializes the worker isolate for background coin fetching
+  /// Creates a one-way connection to avoid blocking the main thread
   Future<void> _initializeWorker() async {
     if (_workerSendPort != null) return;
-    // recive port of main Isolate
+    // Create a receive port in the main isolate
     final receivePort = ReceivePort();
-    // create a coinWorker and send receivePort
+    // Spawn worker isolate and establish communication
     await Isolate.spawn(coinWorker, receivePort.sendPort);
+    // Get the send port from the worker to send messages
     _workerSendPort = await receivePort.first as SendPort;
   }
 
@@ -34,10 +38,5 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
     }
 
     return (rawList as List).map((json) => Coin.fromJson(json)).toList();
-  }
-
-  @override
-  Future<Coin> getCoin(String id) {
-    throw UnimplementedError();
   }
 }

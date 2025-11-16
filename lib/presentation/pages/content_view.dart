@@ -3,6 +3,7 @@ import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// View that displays a list of cryptocurrencies with pull-to-refresh functionality
 class ContentView extends StatelessWidget {
   const ContentView({super.key});
 
@@ -12,11 +13,16 @@ class ContentView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: BlocBuilder<CoinCubit, CoinState>(
         builder: (context, state) {
+          // Show loading spinner during initial load or refresh
           if (state is CoinInitial || state is CoinLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is CoinError) {
+          }
+          // Show error message if load fails
+          else if (state is CoinError) {
             return Center(child: Text('Error: ${state.message}'));
-          } else if (state is CoinLoaded) {
+          }
+          // Show coins list when loaded successfully
+          else if (state is CoinLoaded) {
             final coins = state.coins;
             if (coins.isEmpty) {
               return const Center(child: Text('No coins found'));

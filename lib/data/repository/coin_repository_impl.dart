@@ -3,7 +3,8 @@ import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 
-/// Repository pattern: координирует работу локального и удаленного источников
+/// Repository implementation for coin data using cache-first strategy
+/// Coordinates between local (Isar) and remote (API) data sources
 class CoinRepositoryImpl implements CoinRepo {
   final CoinRemoteDatasource remoteDatasource;
   final CoinLocalDatasource localDatasource;
@@ -15,37 +16,43 @@ class CoinRepositoryImpl implements CoinRepo {
 
   @override
   Future<List<Coin>> getCoins() async {
-    // 1. cashe
+    // First, try to get cached coins
     final cachedCoins = await localDatasource.getCachedCoins();
 
-    // 2. update from network
+    // Then fetch from network to update cache
     try {
       final networkCoins = await remoteDatasource.getCoins();
+      // Cache the fresh data
       await localDatasource.cacheCoins(networkCoins);
       return networkCoins;
     } catch (e) {
-      // Если ошибка сети, вернуть кеш
+      // If network fails, return cached data if available
       if (cachedCoins.isNotEmpty) {
         return cachedCoins;
       }
+      // If no cache available, propagate the error
       rethrow;
     }
   }
 
   @override
   Future<Coin> getCoin(String id) async {
-    // 1. load cashe if exist
+    // First, try to load cached coin if it exists
     final cached = await localDatasource.getCachedCoin(id);
     if (cached != null) {
       return cached;
     }
 
-    // 2. upload from network
+    // If not cached, fetch from network
     try {
-      final coin = await remoteDatasource.getCoin(id);
+      final coin = await remoteDatasource.getCoins().then(
+        (coins) => coins.firstWhere((c) => c.id == id),
+      );
+      // Cache the fresh data
       await localDatasource.cacheCoin(coin);
       return coin;
     } catch (e) {
+      // If network fails and no cache, propagate the error
       rethrow;
     }
   }
