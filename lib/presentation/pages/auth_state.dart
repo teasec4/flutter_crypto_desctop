@@ -16,9 +16,6 @@ final class AuthAuthenticated extends AuthState {
   AuthAuthenticated(this.user);
 }
 
-/// State indicating successful authentication or login
-final class AuthSuccess extends AuthState {}
-
 /// State indicating authentication failure with error message
 final class AuthFailure extends AuthState {
   final String message;

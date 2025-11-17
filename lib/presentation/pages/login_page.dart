@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
+        if (state is AuthAuthenticated) {
           context.go('/');
         } else if (state is AuthFailure) {
           ScaffoldMessenger.of(

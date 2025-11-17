@@ -40,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
+        if (state is AuthAuthenticated) {
           developer.log('Registration successful, navigating to home');
           context.go('/');
         } else if (state is AuthFailure) {

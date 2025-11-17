@@ -22,8 +22,8 @@ class AuthCubit extends Cubit<AuthState> {
       currentUser = await authRepository.register(email, password, displayName);
       // Verify user is logged in after registration
       final isLoggedIn = await authRepository.isUserLoggedIn();
-      if (isLoggedIn) {
-        emit(AuthSuccess());
+      if (isLoggedIn && currentUser != null) {
+        emit(AuthAuthenticated(currentUser!));
       } else {
         emit(AuthFailure('Registration succeeded but user is not logged in'));
       }
@@ -37,7 +37,11 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       currentUser = await authRepository.login(email, password);
-      emit(AuthSuccess());
+      if (currentUser != null) {
+        emit(AuthAuthenticated(currentUser!));
+      } else {
+        emit(AuthFailure('Login failed: user data not available'));
+      }
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
@@ -62,7 +66,11 @@ class AuthCubit extends Cubit<AuthState> {
       final isLoggedIn = await authRepository.isUserLoggedIn();
       if (isLoggedIn) {
         currentUser = await authRepository.getCurrentUser();
-        emit(AuthSuccess());
+        if (currentUser != null) {
+          emit(AuthAuthenticated(currentUser!));
+        } else {
+          emit(AuthInitial());
+        }
       } else {
         emit(AuthInitial());
       }

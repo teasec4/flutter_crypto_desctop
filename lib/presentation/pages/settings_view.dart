@@ -17,6 +17,9 @@ class SettingsView extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
+          // User Profile Header
+          _buildUserProfileHeader(context),
+
           // Notifications Section
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
@@ -95,8 +98,8 @@ class SettingsView extends StatelessWidget {
             child: _buildSectionTitle(context, 'Account'),
           ),
           ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
+            leading: Icon(Icons.logout, color: Colors.red[600]),
+            title: Text('Logout', style: TextStyle(color: Colors.red[600])),
             subtitle: const Text('Sign out from your account'),
             onTap: () => _handleLogout(context),
           ),
@@ -133,6 +136,109 @@ class SettingsView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Builds user profile header with name and sync status
+  Widget _buildUserProfileHeader(BuildContext context) {
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, authState) {
+        String userName = 'User';
+        String userEmail = 'Not connected';
+
+        if (authState is AuthAuthenticated) {
+          userName = authState.user.displayName.isNotEmpty 
+              ? authState.user.displayName 
+              : authState.user.email;
+          userEmail = authState.user.email;
+        }
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  // Avatar
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // User info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userName,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          userEmail,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: UIUtils.getSecondaryTextColor(context),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Sync status
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Synchronized',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

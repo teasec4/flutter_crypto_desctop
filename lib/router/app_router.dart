@@ -1,4 +1,5 @@
 import 'package:crypto_desctop/main.dart';
+import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/coin_detail_page.dart';
 import 'package:crypto_desctop/presentation/pages/content_page.dart';
 import 'package:crypto_desctop/presentation/pages/login_page.dart';
@@ -6,10 +7,32 @@ import 'package:crypto_desctop/presentation/pages/portfolio_page.dart';
 import 'package:crypto_desctop/presentation/pages/register_page.dart';
 import 'package:crypto_desctop/presentation/pages/settings_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
+  redirect: (context, state) {
+    // Get auth cubit from context
+    final authState = context.read<AuthCubit>().state;
+    final isAuth = authState is AuthAuthenticated;
+    
+    final isAuthRoute = state.matchedLocation == '/login' || 
+                        state.matchedLocation == '/register';
+
+    // Redirect to login if not authenticated and trying to access protected routes
+    if (!isAuth && !isAuthRoute) {
+      return '/login';
+    }
+
+    // Redirect to home if authenticated and trying to access auth routes
+    if (isAuth && isAuthRoute) {
+      return '/';
+    }
+
+    // No redirect needed
+    return null;
+  },
   routes: [
     // Auth routes
     GoRoute(
