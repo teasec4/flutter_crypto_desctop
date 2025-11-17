@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/data/datasource/auth_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/user_model.dart' as user_model;
 import 'dart:developer' as developer;
@@ -15,10 +18,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String displayName,
   ) async {
     try {
-      final response = await _supabase.auth.signUp(
-        email: email,
-        password: password,
-      );
+      final response = await _supabase.auth
+          .signUp(
+            email: email,
+            password: password,
+          )
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () => throw TimeoutException(
+              'Registration timeout after ${AppConstants.networkTimeout.inSeconds}s',
+            ),
+          );
 
       final supabaseUser = response.user;
       if (supabaseUser == null) {
@@ -79,10 +89,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   Future<user_model.User> _loginWithRetry(String email, String password) async {
     try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      final response = await _supabase.auth
+          .signInWithPassword(
+            email: email,
+            password: password,
+          )
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () => throw TimeoutException(
+              'Login timeout after ${AppConstants.networkTimeout.inSeconds}s',
+            ),
+          );
 
       final supabaseUser = response.user;
       if (supabaseUser == null) {

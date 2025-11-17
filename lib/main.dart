@@ -67,9 +67,9 @@ class MyApp extends StatelessWidget {
         BlocProvider.value(value: themeCubit),
         BlocProvider(
           create: (context) {
-            final coinCubit = CoinCubit(getIt<CoinRepo>());
-            coinCubit.loadCoins();
-            return coinCubit;
+            // Don't load coins yet - wait for auth check
+            // Security: Only load coins after user is verified as authorized
+            return CoinCubit(getIt<CoinRepo>());
           },
         ),
         BlocProvider(
@@ -79,12 +79,14 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) {
             final portfolioCubit = context.read<PortfolioCubit>();
+            final coinCubit = context.read<CoinCubit>();
             final authCubit = AuthCubit(getIt());
 
-            // Set portfolio cubit reference BEFORE calling any methods
+            // Set portfolio and coin cubit references BEFORE calling any methods
             authCubit.setPortfolioCubit(portfolioCubit);
+            authCubit.setCoinCubit(coinCubit);
 
-            // Check auth status after portfolio cubit is properly set
+            // Check auth status after cubits are properly set
             // Use addPostFrameCallback to ensure all widgets are built
             WidgetsBinding.instance.addPostFrameCallback((_) {
               authCubit.checkAuthStatus();

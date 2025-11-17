@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:http/http.dart' as http;
+
+/// Timeout duration for network requests (10 seconds)
+const Duration _networkTimeout = Duration(seconds: 10);
 
 void coinWorker(SendPort mainSendPort) async {
   final workerReceivePort = ReceivePort();
@@ -20,13 +24,23 @@ void coinWorker(SendPort mainSendPort) async {
       );
 
       try {
-        final response = await http.get(url);
+        // Execute request with timeout for security
+        final response = await http
+            .get(url)
+            .timeout(
+              _networkTimeout,
+              onTimeout: () => throw TimeoutException(
+                'Network request timed out after ${_networkTimeout.inSeconds}s',
+              ),
+            );
 
         if (response.statusCode == 200) {
           final rawList = json.decode(response.body) as List;
           responseSendPort.send(rawList);
         } else {
-          responseSendPort.send({'error': response.statusCode});
+          responseSendPort.send({
+            'error': 'HTTP ${response.statusCode}: ${response.reasonPhrase}',
+          });
         }
       } catch (e) {
         responseSendPort.send({'error': e.toString()});

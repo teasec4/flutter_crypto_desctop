@@ -1,4 +1,6 @@
 import 'dart:isolate';
+import 'dart:developer' as developer;
+import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';

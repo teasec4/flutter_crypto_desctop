@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/data/datasource/portfolio_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/portfolio_item.dart';
 
@@ -6,8 +9,6 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
   final SupabaseClient _supabase;
 
   PortfolioRemoteDataSourceImpl(this._supabase);
-
-  static const String _table = 'portfolio';
 
   @override
   Future<List<PortfolioItem>> getPortfolioItems(String userEmail) async {
@@ -19,14 +20,20 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       }
 
       final response = await _supabase
-          .from(_table)
+          .from(AppConstants.portfolioTable)
           .select()
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .timeout(AppConstants.networkTimeout, onTimeout: () {
+        throw TimeoutException(
+          'Timeout while fetching portfolio items after ${AppConstants.networkTimeout.inSeconds}s',
+        );
+      });
 
       return (response as List)
           .map((item) => PortfolioItem.fromJson(item))
           .toList();
     } catch (e) {
+      developer.log('PortfolioRemoteDataSource: getPortfolioItems error: $e');
       throw Exception('Failed to get portfolio items: ${e.toString()}');
     }
   }
@@ -39,13 +46,21 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
         throw Exception('User not authenticated');
       }
 
-      await _supabase.from(_table).insert({
-        'user_id': userId,
-        'symbol': item.symbol,
-        'amount': item.amount,
-        'added_at': item.addedAt.toIso8601String(),
+      await _supabase
+          .from(AppConstants.portfolioTable)
+          .insert({
+            'user_id': userId,
+            'symbol': item.symbol,
+            'amount': item.amount,
+            'added_at': item.addedAt.toIso8601String(),
+          })
+          .timeout(AppConstants.networkTimeout, onTimeout: () {
+        throw TimeoutException(
+          'Timeout while adding portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+        );
       });
     } catch (e) {
+      developer.log('PortfolioRemoteDataSource: addPortfolioItem error: $e');
       throw Exception('Failed to add portfolio item: ${e.toString()}');
     }
   }
@@ -63,11 +78,17 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       }
 
       await _supabase
-          .from(_table)
+          .from(AppConstants.portfolioTable)
           .update({'amount': newAmount})
           .eq('symbol', itemId)
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .timeout(AppConstants.networkTimeout, onTimeout: () {
+        throw TimeoutException(
+          'Timeout while updating portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+        );
+      });
     } catch (e) {
+      developer.log('PortfolioRemoteDataSource: updatePortfolioItemAmount error: $e');
       throw Exception('Failed to update portfolio item: ${e.toString()}');
     }
   }
@@ -81,11 +102,17 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       }
 
       await _supabase
-          .from(_table)
+          .from(AppConstants.portfolioTable)
           .delete()
           .eq('symbol', itemId)
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .timeout(AppConstants.networkTimeout, onTimeout: () {
+        throw TimeoutException(
+          'Timeout while removing portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+        );
+      });
     } catch (e) {
+      developer.log('PortfolioRemoteDataSource: removePortfolioItem error: $e');
       throw Exception('Failed to remove portfolio item: ${e.toString()}');
     }
   }
@@ -98,8 +125,17 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
         throw Exception('User not authenticated');
       }
 
-      await _supabase.from(_table).delete().eq('user_id', userId);
+      await _supabase
+          .from(AppConstants.portfolioTable)
+          .delete()
+          .eq('user_id', userId)
+          .timeout(AppConstants.networkTimeout, onTimeout: () {
+        throw TimeoutException(
+          'Timeout while clearing portfolio after ${AppConstants.networkTimeout.inSeconds}s',
+        );
+      });
     } catch (e) {
+      developer.log('PortfolioRemoteDataSource: clearUserPortfolio error: $e');
       throw Exception('Failed to clear portfolio: ${e.toString()}');
     }
   }

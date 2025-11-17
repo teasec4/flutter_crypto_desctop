@@ -15,26 +15,24 @@ class PortfolioPage extends StatelessWidget {
         if (state is PortfolioLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is PortfolioLoaded) {
+          // Handle empty portfolio safely
+          if (state.items.isEmpty) {
+            return _buildEmptyPortfolio(context);
+          }
+
           // Calculate total portfolio value
           double totalValue = 0;
           for (var item in state.items) {
+            // Validate item data
+            if (item.totalValue.isNaN || item.totalValue.isInfinite) {
+              continue;
+            }
             totalValue += item.totalValue;
           }
 
-          if (state.items.isEmpty) {
-            return RefreshIndicator(
-              onRefresh: () =>
-                  context.read<PortfolioCubit>().refreshPortfolio(),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(
-                    'No assets in portfolio. Add coins from the home page!',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ),
-            );
+          // Validate total value
+          if (totalValue.isNaN || totalValue.isInfinite) {
+            totalValue = 0;
           }
 
           return RefreshIndicator(
@@ -69,8 +67,16 @@ class PortfolioPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: state.items.length,
                     itemBuilder: (context, index) {
+                      // Safely access items with bounds checking
+                      if (index >= state.items.length) {
+                        return const SizedBox();
+                      }
                       final item = state.items[index];
-                      return _buildPortfolioTile(context, item);
+                      // Validate item before building
+                      if (_isValidPortfolioItem(item)) {
+                        return _buildPortfolioTile(context, item);
+                      }
+                      return const SizedBox();
                     },
                   ),
                 ),
@@ -202,6 +208,74 @@ class PortfolioPage extends StatelessWidget {
             child: const Text('Remove'),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Validates portfolio item data for safe rendering
+  bool _isValidPortfolioItem(PortfolioItem item) {
+    // Check for null or empty symbol
+    if (item.symbol.isEmpty) {
+      return false;
+    }
+
+    // Check for invalid numeric values
+    if (item.amount.isNaN ||
+        item.amount.isInfinite ||
+        item.amount < 0 ||
+        item.currentPrice.isNaN ||
+        item.currentPrice.isInfinite ||
+        item.currentPrice < 0 ||
+        item.totalValue.isNaN ||
+        item.totalValue.isInfinite ||
+        item.totalValue < 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Builds empty portfolio view with helpful message
+  Widget _buildEmptyPortfolio(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.wallet_outlined,
+                    size: 64,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Your portfolio is empty',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Add coins from the home page to build your portfolio',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

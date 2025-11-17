@@ -38,12 +38,14 @@ class CoinError extends CoinState {
 }
 
 /// Cubit for managing the cryptocurrency coins list with pagination
+/// Only loads coins when user is authenticated for security
 class CoinCubit extends Cubit<CoinState> {
   final CoinRepo coinRepo;
   static const int coinsPerPage = 100;
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
   Timer? _autoRefreshTimer;
+  bool _isAuthorized = false;
 
   CoinCubit(this.coinRepo) : super(CoinInitial());
 
@@ -62,9 +64,34 @@ class CoinCubit extends Cubit<CoinState> {
     });
   }
 
+  /// Set authorization status
+  /// Security: Only load coins data when user is authorized
+  void setAuthorized(bool authorized) {
+    _isAuthorized = authorized;
+    developer.log('CoinCubit: Authorization status set to $authorized');
+
+    if (!authorized) {
+      // Clear coins and stop background refresh when user logs out
+      _autoRefreshTimer?.cancel();
+      _autoRefreshTimer = null;
+      emit(CoinInitial());
+      developer.log('CoinCubit: Cleared coins on logout');
+    } else {
+      // Start loading coins when user logs in
+      loadCoins();
+    }
+  }
+
   /// Initial load - tries cache first, then network in background
   /// Called when page is opened
   Future<void> loadCoins() async {
+    // Security: Only load coins if user is authorized
+    if (!_isAuthorized) {
+      developer.log('CoinCubit: loadCoins skipped - user not authorized');
+      emit(CoinInitial());
+      return;
+    }
+
     developer.log('CoinCubit: loadCoins called (initial or manual refresh)');
 
     // Start auto-refresh timer when data is loaded
