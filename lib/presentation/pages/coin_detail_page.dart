@@ -82,13 +82,13 @@ class CoinDetailView extends StatelessWidget {
              final coin = state.coin;
              final chartData = state.chartData;
              return SingleChildScrollView(
-               child: Padding(
-                 padding: const EdgeInsets.all(16.0),
-                 child: Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     // Back button and header
-                     Row(
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   // Back button and header
+                   Padding(
+                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                     child: Row(
                        children: [
                          IconButton(
                            icon: const Icon(Icons.arrow_back),
@@ -102,132 +102,160 @@ class CoinDetailView extends StatelessWidget {
                          ),
                        ],
                      ),
-                     const SizedBox(height: 16),
+                   ),
+                   const SizedBox(height: 16),
 
-                     // Price chart (moved to top - FIRST)
-                     if (chartData != null)
-                       CoinChartWidget(
-                         chartData: chartData,
-                         selectedDays: selectedChartDays,
-                         onDaysChanged: (days) {
-                           onChartDaysChanged?.call(days);
-                         },
-                       ),
-                     const SizedBox(height: 24),
-
-                     // Coin image and basic info
-                     Center(
-                       child: Column(
-                         children: [
-                           Image.network(
-                             coin.imageUrl,
-                             width: 80,
-                             height: 80,
-                             errorBuilder: (_, __, ___) =>
-                                 const Icon(Icons.error, size: 80),
-                           ),
-                           const SizedBox(height: 16),
-                           Text(
-                             coin.symbol.toUpperCase(),
-                             style: Theme.of(context).textTheme.titleLarge,
-                           ),
-                         ],
-                       ),
-                     ),
-                     const SizedBox(height: 32),
-
-                     // Price section
-                     Column(
+                   // Price chart (moved to top - FIRST)
+                   Padding(
+                     padding: const EdgeInsets.symmetric(horizontal: 16),
+                     child: Column(
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
-                         Text(
-                           'Current Price',
-                           style: Theme.of(context).textTheme.titleMedium,
-                         ),
-                         const SizedBox(height: 8),
-                         Text(
-                           '\$${coin.price.toStringAsFixed(2)}',
-                           style: Theme.of(
-                             context,
-                           ).textTheme.headlineSmall,
-                         ),
+                         if (chartData != null)
+                           CoinChartWidget(
+                             chartData: chartData,
+                             selectedDays: selectedChartDays,
+                             onDaysChanged: (days) {
+                               onChartDaysChanged?.call(days);
+                             },
+                           ),
                        ],
                      ),
-                     const SizedBox(height: 24),
+                   ),
+                   const SizedBox(height: 32),
 
-                     // 24h change
-                     Row(
-                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                   // All info in one section
+                   Padding(
+                     padding: const EdgeInsets.symmetric(horizontal: 16),
+                     child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
-                         Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             Text(
-                               '24h Change',
-                               style: Theme.of(
-                                 context,
-                               ).textTheme.titleMedium,
-                             ),
-                             const SizedBox(height: 8),
-                             Text(
-                               '\$${coin.priceChange24H.toStringAsFixed(2)}',
-                               style: TextStyle(
-                                 fontSize: 16,
-                                 color: coin.priceChange24H >= 0
-                                     ? Colors.green.shade500
-                                     : Colors.red.shade400,
+                         // Coin image and symbol
+                         Center(
+                           child: Column(
+                             children: [
+                               Image.network(
+                                 coin.imageUrl,
+                                 width: 60,
+                                 height: 60,
+                                 errorBuilder: (_, __, ___) =>
+                                     const Icon(Icons.error, size: 60),
                                ),
+                               const SizedBox(height: 12),
+                               Text(
+                                 coin.symbol.toUpperCase(),
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                   fontWeight: FontWeight.bold,
+                                 ),
+                               ),
+                             ],
+                           ),
+                         ),
+                         const SizedBox(height: 24),
+
+                         // Current Price
+                         Row(
+                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                           children: [
+                             Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               children: [
+                                 Text(
+                                   'Price',
+                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                   ),
+                                 ),
+                                 const SizedBox(height: 4),
+                                 Text(
+                                   '\$${coin.price.toStringAsFixed(2)}',
+                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                     fontWeight: FontWeight.bold,
+                                   ),
+                                 ),
+                               ],
+                             ),
+                             Column(
+                               crossAxisAlignment: CrossAxisAlignment.end,
+                               children: [
+                                 Text(
+                                   '24h Change',
+                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                   ),
+                                 ),
+                                 const SizedBox(height: 4),
+                                 Text(
+                                   '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
+                                   style: TextStyle(
+                                     fontSize: 18,
+                                     fontWeight: FontWeight.bold,
+                                     color: coin.priceChangePercentage24H >= 0
+                                         ? Colors.green.shade500
+                                         : Colors.red.shade400,
+                                   ),
+                                 ),
+                               ],
                              ),
                            ],
                          ),
-                         Column(
-                           crossAxisAlignment: CrossAxisAlignment.end,
+                         const SizedBox(height: 20),
+
+                         // Details in a grid
+                         Row(
                            children: [
-                             Text(
-                               '24h Change %',
-                               style: Theme.of(
-                                 context,
-                               ).textTheme.titleMedium,
-                             ),
-                             const SizedBox(height: 8),
-                             Text(
-                               '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
-                               style: TextStyle(
-                                 fontSize: 16,
-                                 fontWeight: FontWeight.bold,
-                                 color: coin.priceChangePercentage24H >= 0
-                                     ? Colors.green.shade500
-                                     : Colors.red.shade400,
+                             Expanded(
+                               child: Column(
+                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                 children: [
+                                   Text(
+                                     '24h Change',
+                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                     ),
+                                   ),
+                                   const SizedBox(height: 4),
+                                   Text(
+                                     '\$${coin.priceChange24H.toStringAsFixed(2)}',
+                                     style: TextStyle(
+                                       fontSize: 14,
+                                       fontWeight: FontWeight.bold,
+                                       color: coin.priceChange24H >= 0
+                                           ? Colors.green.shade500
+                                           : Colors.red.shade400,
+                                     ),
+                                   ),
+                                 ],
                                ),
                              ),
+                             if (coin.marketCapRank > 0)
+                               Expanded(
+                                 child: Column(
+                                   crossAxisAlignment: CrossAxisAlignment.end,
+                                   children: [
+                                     Text(
+                                       'Rank',
+                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                       ),
+                                     ),
+                                     const SizedBox(height: 4),
+                                     Text(
+                                       '#${coin.marketCapRank}',
+                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                         fontWeight: FontWeight.bold,
+                                       ),
+                                     ),
+                                   ],
+                                 ),
+                               ),
                            ],
                          ),
                        ],
                      ),
-                     const SizedBox(height: 24),
-
-                     // Market rank
-                     if (coin.marketCapRank > 0)
-                       Column(
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           Text(
-                             'Market Cap Rank',
-                             style: Theme.of(
-                               context,
-                             ).textTheme.titleMedium,
-                           ),
-                           const SizedBox(height: 8),
-                           Text(
-                             '#${coin.marketCapRank}',
-                             style: Theme.of(
-                               context,
-                             ).textTheme.headlineSmall,
-                           ),
-                         ],
-                       ),
-                   ],
-                 ),
+                   ),
+                   const SizedBox(height: 32),
+                 ],
                ),
              );
             }

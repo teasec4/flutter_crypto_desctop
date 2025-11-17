@@ -54,25 +54,15 @@ class SettingsView extends StatelessWidget {
             },
           ),
 
-          // Currency Section (placeholder for future implementation)
+          // Currency Section
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
             child: _buildSectionTitle(context, 'Currency'),
           ),
-          ListTile(
-            leading: const Icon(Icons.currency_exchange),
-            title: const Text('Select currency'),
-            trailing: SizedBox(
-              width: 100,
-              child: DropdownButton<String>(
-                value: 'USD',
-                underline: const SizedBox(),
-                items: ['USD', 'EUR', 'RUB', 'GBP']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ),
+          const ListTile(
+            leading: Icon(Icons.currency_exchange),
+            title: Text('Currency'),
+            trailing: Text('USD'),
           ),
 
           // About Section

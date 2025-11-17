@@ -30,84 +30,100 @@ class CoinTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Market cap rank
-          Text(
-            UIUtils.formatRank(coin.marketCapRank),
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          minVerticalPadding: 0,
+          dense: true,
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Market cap rank
+              Text(
+                UIUtils.formatRank(coin.marketCapRank),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: UIUtils.getSecondaryTextColor(context),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Coin icon/image
+              Image.network(
+                coin.imageUrl,
+                width: 20,
+                height: 20,
+                errorBuilder: (_, __, ___) => const Icon(Icons.error, size: 20),
+              ),
+            ],
+          ),
+          // Coin name
+          title: Text(
+            coin.name,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+          // Coin symbol
+          subtitle: Text(
+            coin.symbol.toUpperCase(),
             style: TextStyle(
-              fontSize: 12,
               color: UIUtils.getSecondaryTextColor(context),
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
-          const SizedBox(width: 8),
-          // Coin icon/image
-          Image.network(
-            coin.imageUrl,
-            width: 20,
-            height: 20,
-            errorBuilder: (_, __, ___) => const Icon(Icons.error, size: 20),
-          ),
-        ],
-      ),
-      // Coin name
-      title: Text(
-        coin.name,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      // Coin symbol
-      subtitle: Text(
-        coin.symbol.toUpperCase(),
-        style: TextStyle(
-          color: UIUtils.getSecondaryTextColor(context),
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Price and 24h change
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Current price
-              Text(
-                '\$${coin.price.toStringAsFixed(2)}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              // Price and 24h change
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Current price
+                  Text(
+                    '\$${coin.price.toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  // 24 hour price change percentage
+                  Text(
+                    '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      color: coin.priceChangePercentage24H >= 0
+                          ? Colors.green.shade500
+                          : Colors.red.shade400,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
               ),
-              // 24 hour price change percentage
-              Text(
-                '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
-                style: TextStyle(
-                  color: coin.priceChangePercentage24H >= 0
-                      ? Colors.green.shade500
-                      : Colors.red.shade400,
-                  fontSize: 12,
+              const SizedBox(width: 12),
+              // Add to portfolio button
+              SizedBox(
+                width: 36,
+                height: 36,
+                child: IconButton(
+                  iconSize: 18,
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.add_sharp),
+                  onPressed: () => _showAddToPortfolioModal(context),
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 12),
-          // Add to portfolio button
-          SizedBox(
-            width: 40,
-            height: 40,
-            child: IconButton(
-              iconSize: 20,
-              padding: EdgeInsets.zero,
-              icon: const Icon(Icons.add_sharp),
-              onPressed: () => _showAddToPortfolioModal(context),
-            ),
+          // Navigate to coin detail page on tap
+          onTap: () => context.goToCoinDetail(coin.id),
+        ),
+        // Divider
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Divider(
+            height: 1,
+            thickness: 0.5,
+            color: UIUtils.getSecondaryTextColor(context).withValues(alpha: 0.1),
           ),
-        ],
-      ),
-      // Navigate to coin detail page on tap
-      onTap: () => context.goToCoinDetail(coin.id),
+        ),
+      ],
     );
   }
 }
