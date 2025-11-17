@@ -21,13 +21,13 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
   }
 
   @override
-  Future<List<Coin>> getCoins() async {
+  Future<List<Coin>> getCoins({int page = 1, int perPage = 100}) async {
     await _initializeWorker();
 
     final receivePort = ReceivePort();
     _workerSendPort!.send({
-      'page': 1,
-      'perPage': 20,
+      'page': page,
+      'perPage': perPage,
       'sendPort': receivePort.sendPort,
     });
 
