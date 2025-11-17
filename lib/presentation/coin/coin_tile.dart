@@ -66,46 +66,41 @@ class CoinTile extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      trailing: SizedBox(
-        width: 140,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Price and 24h change
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // Current price
-                  Text(
-                    '\$${coin.price.toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  // 24 hour price change percentage
-                  Text(
-                    '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
-                    style: TextStyle(
-                      color: coin.priceChangePercentage24H >= 0
-                          ? Colors.green.shade500
-                          : Colors.red.shade400,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Price and 24h change
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Current price
+              Text(
+                '\$${coin.price.toStringAsFixed(2)}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(width: 8),
-            // Add to portfolio button
-            IconButton(
-              iconSize: 20,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: const Icon(Icons.add_sharp),
-              onPressed: () => _showAddToPortfolioModal(context),
-            ),
-          ],
-        ),
+              // 24 hour price change percentage
+              Text(
+                '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
+                style: TextStyle(
+                  color: coin.priceChangePercentage24H >= 0
+                      ? Colors.green.shade500
+                      : Colors.red.shade400,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 8),
+          // Add to portfolio button
+          IconButton(
+            iconSize: 20,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.add_sharp),
+            onPressed: () => _showAddToPortfolioModal(context),
+          ),
+        ],
       ),
       // Navigate to coin detail page on tap
       onTap: () => context.goToCoinDetail(coin.id),

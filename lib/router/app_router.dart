@@ -6,7 +6,6 @@ import 'package:crypto_desctop/presentation/pages/login_page.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_page.dart';
 import 'package:crypto_desctop/presentation/pages/register_page.dart';
 import 'package:crypto_desctop/presentation/pages/settings_view.dart';
-import 'package:crypto_desctop/presentation/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -17,20 +16,13 @@ final appRouter = GoRouter(
     // Get auth cubit from context
     final authState = context.read<AuthCubit>().state;
     final isAuth = authState is AuthAuthenticated;
-    final isInitializing = authState is AuthInitializing;
 
     final isAuthRoute =
         state.matchedLocation == '/login' ||
-        state.matchedLocation == '/register' ||
-        state.matchedLocation == '/splash';
-
-    // Show splash screen while initializing
-    if (isInitializing && !state.matchedLocation.startsWith('/splash')) {
-      return '/splash';
-    }
+        state.matchedLocation == '/register';
 
     // Redirect to login if not authenticated and trying to access protected routes
-    if (!isAuth && !isInitializing && !isAuthRoute) {
+    if (!isAuth && !isAuthRoute) {
       return '/login';
     }
 
@@ -52,16 +44,6 @@ final appRouter = GoRouter(
       path: '/register',
       pageBuilder: (context, state) =>
           const MaterialPage(child: RegisterPage()),
-    ),
-    GoRoute(
-      path: '/splash',
-      pageBuilder: (context, state) {
-        final authState = context.read<AuthCubit>().state;
-        final userName = (authState is AuthInitializing)
-            ? authState.user.displayName
-            : null;
-        return MaterialPage(child: SplashPage(userName: userName));
-      },
     ),
 
     // Main app routes with shell

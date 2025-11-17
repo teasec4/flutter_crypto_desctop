@@ -11,7 +11,7 @@ import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:crypto_desctop/router/app_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -203,35 +203,101 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDrawer(BuildContext context, int selectedIndex) {
     return Drawer(
       child: SafeArea(
-        child: Center(
-          child: ListView(
-            children: [
-              ListTile(
-                title: const Text("Home"),
-                selected: selectedIndex == 0,
-                onTap: () {
-                  context.go(AppConstants.homeRoute);
-                  Navigator.of(context).pop();
-                },
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  ListTile(
+                    title: const Text("Home"),
+                    selected: selectedIndex == 0,
+                    onTap: () {
+                      context.go(AppConstants.homeRoute);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Portfolio"),
+                    selected: selectedIndex == 1,
+                    onTap: () {
+                      context.go(AppConstants.portfolioRoute);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Settings"),
+                    selected: selectedIndex == 2,
+                    onTap: () {
+                      context.go(AppConstants.settingsRoute);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
               ),
-              ListTile(
-                title: const Text("Portfolio"),
-                selected: selectedIndex == 1,
-                onTap: () {
-                  context.go(AppConstants.portfolioRoute);
-                  Navigator.of(context).pop();
-                },
-              ),
-              ListTile(
-                title: const Text("Settings"),
-                selected: selectedIndex == 2,
-                onTap: () {
-                  context.go(AppConstants.settingsRoute);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
+            ),
+            // User info and sync status
+            BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, authState) {
+                final userEmail = (authState is AuthAuthenticated)
+                    ? authState.user.email
+                    : 'Guest';
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      const SizedBox(height: 8),
+                      Text(
+                        userEmail,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.cloud_done,
+                            size: 14,
+                            color: Colors.green.shade400,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Synchronized',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'v1.0.0',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Made with Flutter',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -11,9 +11,8 @@ part 'auth_state.dart';
 ///
 /// Auth Flow:
 /// 1. login() → AuthLoading
-/// 2. User authenticated → AuthInitializing (show splash)
-/// 3. _initializeUserData() loads portfolio & coins in parallel
-/// 4. → AuthAuthenticated (router redirects to home)
+/// 2. _initializeUserData() loads portfolio & coins in parallel
+/// 3. → AuthAuthenticated (router redirects to home)
 ///
 /// logout() → AuthInitial (clears portfolio & coins)
 class AuthCubit extends Cubit<AuthState> {
@@ -46,13 +45,8 @@ class AuthCubit extends Cubit<AuthState> {
       // Verify user is logged in after registration
       final isLoggedIn = await authRepository.isUserLoggedIn();
       if (isLoggedIn && currentUser != null) {
-        // Show splash screen while loading data
-        emit(AuthInitializing(currentUser!));
-        debugPrint('AuthCubit: Emitted AuthInitializing state');
-        
         // Load portfolio and coins in parallel for new user
         await _initializeUserData(email);
-        debugPrint('AuthCubit: About to emit AuthAuthenticated');
         emit(AuthAuthenticated(currentUser!));
       } else {
         emit(AuthFailure('Registration succeeded but user is not logged in'));
@@ -68,9 +62,6 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       currentUser = await authRepository.login(email, password);
       if (currentUser != null) {
-        // Show splash screen while loading data
-        emit(AuthInitializing(currentUser!));
-        
         // Load portfolio and coins in parallel for logged in user
         await _initializeUserData(email);
         emit(AuthAuthenticated(currentUser!));
