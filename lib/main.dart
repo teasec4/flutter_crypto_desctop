@@ -5,7 +5,9 @@ import 'package:crypto_desctop/core/theme/theme_cubit.dart';
 import 'package:crypto_desctop/data/models/isar_coin_model.dart';
 import 'package:crypto_desctop/data/models/isar_user_model.dart';
 import 'package:crypto_desctop/di/service_locator.dart';
+import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
+import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:crypto_desctop/router/app_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -54,6 +56,13 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider(
+          create: (context) {
+            final coinCubit = CoinCubit(getIt<CoinRepo>());
+            coinCubit.loadCoins();
+            return coinCubit;
+          },
+        ),
         BlocProvider(
           create: (context) =>
               PortfolioCubit(portfolioRepository: getIt(), coinRepo: getIt()),

@@ -48,11 +48,10 @@ class CoinRepositoryImpl implements CoinRepo {
       return cached;
     }
 
-    // If not cached, fetch from network
+    // If not cached, fetch from network (page 1 only, should be enough for most coins)
     try {
-      final coin = await remoteDatasource.getCoins().then(
-        (coins) => coins.firstWhere((c) => c.id == id),
-      );
+      final coins = await remoteDatasource.getCoins(page: 1, perPage: 100);
+      final coin = coins.firstWhere((c) => c.id == id);
       // Cache the fresh data
       await localDatasource.cacheCoin(coin);
       return coin;

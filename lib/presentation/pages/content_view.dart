@@ -70,10 +70,10 @@ class _ContentViewState extends State<ContentView> {
               return const Center(child: CircularProgressIndicator());
             }
             
-            // Loading more coins (append mode with indicator at bottom)
+            // Refreshing or loading more - show coins with loading indicator at bottom
             return RefreshIndicator(
               onRefresh: () async {
-                await context.read<CoinCubit>().loadCoins();
+                await context.read<CoinCubit>().refreshCoins();
               },
               child: ListView.builder(
                 controller: _scrollController,
@@ -112,7 +112,7 @@ class _ContentViewState extends State<ContentView> {
             
             return RefreshIndicator(
               onRefresh: () async {
-                await context.read<CoinCubit>().loadCoins();
+                await context.read<CoinCubit>().refreshCoins();
               },
               child: ListView.builder(
                 controller: _scrollController,
