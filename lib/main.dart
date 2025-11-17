@@ -4,6 +4,7 @@ import 'package:crypto_desctop/core/theme/app_theme.dart';
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
 import 'package:crypto_desctop/data/models/isar_coin_model.dart';
 import 'package:crypto_desctop/data/models/isar_user_model.dart';
+import 'package:crypto_desctop/data/models/portfolio_item_model.dart';
 import 'package:crypto_desctop/di/service_locator.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
@@ -40,6 +41,7 @@ void main() async {
     final isar = await Isar.open([
       IsarCoinSchema,
       IsarUserSchema,
+      PortfolioItemModelSchema,
     ], directory: isarDir.path);
 
     setupServiceLocator(isar);

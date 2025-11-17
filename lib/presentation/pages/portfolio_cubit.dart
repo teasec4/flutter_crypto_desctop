@@ -16,7 +16,6 @@ class PortfolioCubit extends Cubit<PortfolioState> {
   final CoinRepo coinRepo;
   String? _currentUserEmail;
   Timer? _autoRefreshTimer;
-  DateTime? _lastLoadTime;
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
   PortfolioCubit({required this.portfolioRepository, required this.coinRepo})
@@ -48,13 +47,13 @@ class PortfolioCubit extends Cubit<PortfolioState> {
   Future<void> loadPortfolioInitial(String userEmail) async {
     developer.log('PortfolioCubit: loadPortfolioInitial called');
     _currentUserEmail = userEmail;
-    
+
     // Start auto-refresh timer when data is loaded
     _startAutoRefreshTimer();
-    
+
     // Try to load from cache first
     await _loadPortfolioFromCache(userEmail);
-    
+
     // Then load from network (with loading indicator)
     await _loadPortfolioNetwork(showLoading: true, userEmail: userEmail);
   }
@@ -64,7 +63,9 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     try {
       final items = await portfolioRepository.getPortfolioItems(userEmail);
       if (items.isNotEmpty) {
-        developer.log('PortfolioCubit: Loaded ${items.length} items from cache');
+        developer.log(
+          'PortfolioCubit: Loaded ${items.length} items from cache',
+        );
         final enrichedItems = await _enrichItemsWithPrices(items);
         emit(PortfolioLoaded(enrichedItems));
       }
@@ -75,37 +76,39 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
   /// Loads portfolio from network with loading state
   /// [showLoading] - if true, emits PortfolioLoading state; if false, silently updates in background
+  /// [forceFresh] - if true, bypasses cache and fetches from network directly
   Future<void> _loadPortfolioNetwork({
     bool showLoading = true,
     String? userEmail,
+    bool forceFresh = false,
   }) async {
     final email = userEmail ?? _currentUserEmail;
     if (email == null) return;
 
     try {
-      final previousItems = (state is PortfolioLoaded) 
-          ? (state as PortfolioLoaded).items 
-          : <PortfolioItem>[];
-      
       // Only show loading if explicitly requested
       if (showLoading) {
         emit(PortfolioLoading());
       }
-      
-      final items = await portfolioRepository.getPortfolioItems(email);
-      _lastLoadTime = DateTime.now();
+
+      // Use fresh fetch if explicitly requested (manual refresh)
+      final items = forceFresh
+          ? await portfolioRepository.getPortfolioItemsFresh(email)
+          : await portfolioRepository.getPortfolioItems(email);
 
       // Fetch current prices for all portfolio items
       final enrichedItems = await _enrichItemsWithPrices(items);
 
-      developer.log('PortfolioCubit: Loaded ${enrichedItems.length} items from network');
+      developer.log(
+        'PortfolioCubit: Loaded ${enrichedItems.length} items from network',
+      );
       emit(PortfolioLoaded(enrichedItems));
     } catch (e) {
       developer.log('PortfolioCubit: Network load failed - $e');
-      final previousItems = (state is PortfolioLoading) 
-          ? <PortfolioItem>[] 
-          : (state is PortfolioLoaded) ? (state as PortfolioLoaded).items : <PortfolioItem>[];
-      
+      final previousItems = (state is PortfolioLoaded)
+          ? (state as PortfolioLoaded).items
+          : <PortfolioItem>[];
+
       if (previousItems.isEmpty && state is! PortfolioLoaded) {
         // If no previous data and initial load failed
         emit(PortfolioError('Failed to load portfolio: ${e.toString()}'));
@@ -116,10 +119,10 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     }
   }
 
-  /// Manual refresh - force network update with loading indicator
+  /// Manual refresh - force fresh network update with loading indicator
   Future<void> refreshPortfolio() async {
     developer.log('PortfolioCubit: refreshPortfolio called (manual)');
-    await _loadPortfolioNetwork(showLoading: true);
+    await _loadPortfolioNetwork(showLoading: true, forceFresh: true);
   }
 
   /// Fetch current prices and info for portfolio items

@@ -5,6 +5,8 @@ import 'package:crypto_desctop/data/datasource/coin_local_datasource.dart';
 import 'package:crypto_desctop/data/datasource/coin_local_datasource_impl.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource_impl.dart';
+import 'package:crypto_desctop/data/datasource/portfolio_local_datasource.dart';
+import 'package:crypto_desctop/data/datasource/portfolio_local_datasource_impl.dart';
 import 'package:crypto_desctop/data/datasource/portfolio_remote_datasource.dart';
 import 'package:crypto_desctop/data/datasource/portfolio_remote_datasource_impl.dart';
 import 'package:crypto_desctop/data/datasource/user_local_datasource.dart';
@@ -68,7 +70,12 @@ void setupServiceLocator(Isar isar) {
     ),
   );
 
-  // ======== PORTFOLIO (Supabase) ========
+  // ======== PORTFOLIO ========
+  // reg PortfolioLocalDatasource
+  getIt.registerSingleton<PortfolioLocalDataSource>(
+    PortfolioLocalDataSourceImpl(getIt<Isar>()),
+  );
+
   // reg PortfolioRemoteDataSource
   getIt.registerSingleton<PortfolioRemoteDataSource>(
     PortfolioRemoteDataSourceImpl(Supabase.instance.client),
@@ -78,6 +85,7 @@ void setupServiceLocator(Isar isar) {
   getIt.registerSingleton<PortfolioRepository>(
     PortfolioRepositoryImpl(
       remoteDataSource: getIt<PortfolioRemoteDataSource>(),
+      localDataSource: getIt<PortfolioLocalDataSource>(),
     ),
   );
 

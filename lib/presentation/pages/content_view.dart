@@ -32,12 +32,13 @@ class _ContentViewState extends State<ContentView> {
   /// Detects when user scrolls near the bottom and loads more coins
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    
+
     final position = _scrollController.position;
     // When user scrolls to 80% of the list, load more
     const threshold = 0.8;
-    
-    if (position.pixels > position.maxScrollExtent * threshold && !_isLoadingMore) {
+
+    if (position.pixels > position.maxScrollExtent * threshold &&
+        !_isLoadingMore) {
       _isLoadingMore = true;
       context.read<CoinCubit>().loadMoreCoins().then((_) {
         _isLoadingMore = false;
@@ -55,21 +56,21 @@ class _ContentViewState extends State<ContentView> {
           if (state is CoinInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           // Show error message if initial load fails
           if (state is CoinError && state.previousCoins.isEmpty) {
             return Center(child: Text('Error: ${state.message}'));
           }
-          
+
           // Handle CoinLoading state
           if (state is CoinLoading) {
             final coins = state.coins;
-            
+
             // Initial loading (no coins yet)
             if (coins.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
-            
+
             // Refreshing or loading more - show coins with loading indicator at bottom
             return RefreshIndicator(
               onRefresh: () async {
@@ -87,29 +88,27 @@ class _ContentViewState extends State<ContentView> {
                         child: SizedBox(
                           width: 24,
                           height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       ),
                     );
                   }
-                  
+
                   final coin = coins[index];
                   return CoinTile(coin: coin);
                 },
               ),
             );
           }
-          
+
           // Handle CoinLoaded state
           if (state is CoinLoaded) {
             final coins = state.coins;
-            
+
             if (coins.isEmpty) {
               return const Center(child: Text('No coins found'));
             }
-            
+
             return RefreshIndicator(
               onRefresh: () async {
                 await context.read<CoinCubit>().refreshCoins();
@@ -124,7 +123,7 @@ class _ContentViewState extends State<ContentView> {
               ),
             );
           }
-          
+
           return const SizedBox.shrink();
         },
       ),

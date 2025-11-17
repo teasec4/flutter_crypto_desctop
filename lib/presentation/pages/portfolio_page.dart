@@ -1,6 +1,5 @@
 import 'package:crypto_desctop/core/utils/ui_utils.dart';
 import 'package:crypto_desctop/domain/models/portfolio_item.dart';
-import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +23,8 @@ class PortfolioPage extends StatelessWidget {
 
           if (state.items.isEmpty) {
             return RefreshIndicator(
-              onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
+              onRefresh: () =>
+                  context.read<PortfolioCubit>().refreshPortfolio(),
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
@@ -46,6 +46,7 @@ class PortfolioPage extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+
                     children: [
                       Text(
                         'Total Portfolio Value',
@@ -77,27 +78,28 @@ class PortfolioPage extends StatelessWidget {
             ),
           );
         } else if (state is PortfolioError) {
-           return Center(
-             child: Column(
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Text('Error: ${state.message}'),
-                 const SizedBox(height: 16),
-                 ElevatedButton(
-                   onPressed: () => context.read<PortfolioCubit>().refreshPortfolio(),
-                   child: const Text('Retry'),
-                 ),
-               ],
-             ),
-           );
-         }
-         return const SizedBox();
-       },
-     );
-   }
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: ${state.message}'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () =>
+                      context.read<PortfolioCubit>().refreshPortfolio(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
 
-        /// Builds a tile widget for a single portfolio item
-        Widget _buildPortfolioTile(BuildContext context, PortfolioItem item) {
+  /// Builds a tile widget for a single portfolio item
+  Widget _buildPortfolioTile(BuildContext context, PortfolioItem item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: ListTile(

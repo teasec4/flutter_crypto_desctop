@@ -16,19 +16,31 @@ class CoinRepositoryImpl implements CoinRepo {
 
   @override
   Future<List<Coin>> getCoins({int page = 1, int perPage = 100}) async {
-    // For pagination, only cache page 1 for initial load optimization
-    // Subsequent pages are fetched fresh
-    
-    // Then fetch from network
+    // Cache-first strategy: try local first, then network
+
+    // Try to get from cache first (especially important on app startup)
+    if (page == 1) {
+      final cachedCoins = await localDatasource.getCachedCoins();
+      if (cachedCoins.isNotEmpty) {
+        // Return cached data immediately and sync fresh data in background
+        _syncCoinsInBackground(page, perPage);
+        return cachedCoins;
+      }
+    }
+
+    // If no cache, fetch from network
     try {
-      final networkCoins = await remoteDatasource.getCoins(page: page, perPage: perPage);
+      final networkCoins = await remoteDatasource.getCoins(
+        page: page,
+        perPage: perPage,
+      );
       // Cache only the first page
       if (page == 1) {
         await localDatasource.cacheCoins(networkCoins);
       }
       return networkCoins;
     } catch (e) {
-      // If it's page 1 and network fails, return cached data if available
+      // If network fails and we haven't returned cache yet, try once more
       if (page == 1) {
         final cachedCoins = await localDatasource.getCachedCoins();
         if (cachedCoins.isNotEmpty) {
@@ -36,6 +48,46 @@ class CoinRepositoryImpl implements CoinRepo {
         }
       }
       // If no cache available or not page 1, propagate the error
+      rethrow;
+    }
+  }
+
+  /// Syncs coins from network in background
+  Future<void> _syncCoinsInBackground(int page, int perPage) async {
+    try {
+      final networkCoins = await remoteDatasource.getCoins(
+        page: page,
+        perPage: perPage,
+      );
+      if (page == 1) {
+        await localDatasource.cacheCoins(networkCoins);
+      }
+    } catch (e) {
+      // Silent fail - user sees cached data
+    }
+  }
+
+  /// Force refresh from network, ignoring cache
+  @override
+  Future<List<Coin>> getCoinsFresh({int page = 1, int perPage = 100}) async {
+    try {
+      final networkCoins = await remoteDatasource.getCoins(
+        page: page,
+        perPage: perPage,
+      );
+      // Cache only the first page
+      if (page == 1) {
+        await localDatasource.cacheCoins(networkCoins);
+      }
+      return networkCoins;
+    } catch (e) {
+      // If fresh fetch fails, fall back to cache
+      if (page == 1) {
+        final cachedCoins = await localDatasource.getCachedCoins();
+        if (cachedCoins.isNotEmpty) {
+          return cachedCoins;
+        }
+      }
       rethrow;
     }
   }

@@ -147,8 +147,8 @@ class SettingsView extends StatelessWidget {
         String userEmail = 'Not connected';
 
         if (authState is AuthAuthenticated) {
-          userName = authState.user.displayName.isNotEmpty 
-              ? authState.user.displayName 
+          userName = authState.user.displayName.isNotEmpty
+              ? authState.user.displayName
               : authState.user.email;
           userEmail = authState.user.email;
         }
@@ -195,17 +195,17 @@ class SettingsView extends StatelessWidget {
                       children: [
                         Text(
                           userName,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           userEmail,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: UIUtils.getSecondaryTextColor(context),
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: UIUtils.getSecondaryTextColor(context),
+                              ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

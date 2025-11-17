@@ -16,9 +16,10 @@ final appRouter = GoRouter(
     // Get auth cubit from context
     final authState = context.read<AuthCubit>().state;
     final isAuth = authState is AuthAuthenticated;
-    
-    final isAuthRoute = state.matchedLocation == '/login' || 
-                        state.matchedLocation == '/register';
+
+    final isAuthRoute =
+        state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register';
 
     // Redirect to login if not authenticated and trying to access protected routes
     if (!isAuth && !isAuthRoute) {
