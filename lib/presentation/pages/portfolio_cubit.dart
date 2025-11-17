@@ -14,7 +14,7 @@ part 'portfolio_state.dart';
 class PortfolioCubit extends Cubit<PortfolioState> {
   final PortfolioRepository portfolioRepository;
   final CoinRepo coinRepo;
-  String? _currentUserEmail;
+  String _currentUserEmail = ''; // Initialize as empty string, never null
   Timer? _autoRefreshTimer;
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
@@ -88,7 +88,12 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     bool forceFresh = false,
   }) async {
     final email = userEmail ?? _currentUserEmail;
-    if (email == null) return;
+    if (email.isEmpty) {
+      developer.log(
+        'PortfolioCubit: User email not set, skipping network load',
+      );
+      return;
+    }
 
     try {
       // Only show loading if explicitly requested
@@ -164,7 +169,7 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
   /// Add new asset to portfolio
   Future<void> addAsset(String symbol, double amount) async {
-    if (_currentUserEmail == null) {
+    if (_currentUserEmail.isEmpty) {
       emit(PortfolioError('User not authenticated'));
       return;
     }
@@ -177,7 +182,7 @@ class PortfolioCubit extends Cubit<PortfolioState> {
         addedAt: DateTime.now(),
       );
 
-      await portfolioRepository.addPortfolioItem(_currentUserEmail!, item);
+      await portfolioRepository.addPortfolioItem(_currentUserEmail, item);
       emit(PortfolioItemAdded(item));
 
       // Reload portfolio after adding
@@ -190,14 +195,14 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
   /// Update amount of existing portfolio item
   Future<void> updateAssetAmount(String itemId, double newAmount) async {
-    if (_currentUserEmail == null) {
+    if (_currentUserEmail.isEmpty) {
       emit(PortfolioError('User not authenticated'));
       return;
     }
 
     try {
       await portfolioRepository.updatePortfolioItemAmount(
-        _currentUserEmail!,
+        _currentUserEmail,
         itemId,
         newAmount,
       );
@@ -212,13 +217,13 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
   /// Remove asset from portfolio
   Future<void> removeAsset(String itemId) async {
-    if (_currentUserEmail == null) {
+    if (_currentUserEmail.isEmpty) {
       emit(PortfolioError('User not authenticated'));
       return;
     }
 
     try {
-      await portfolioRepository.removePortfolioItem(_currentUserEmail!, itemId);
+      await portfolioRepository.removePortfolioItem(_currentUserEmail, itemId);
       emit(PortfolioItemRemoved(itemId));
 
       // Reload portfolio after removing
@@ -232,20 +237,25 @@ class PortfolioCubit extends Cubit<PortfolioState> {
   /// Clear local state when user logs out
   /// Portfolio data on server is NOT deleted
   void clear() {
-    _currentUserEmail = null;
+    _currentUserEmail = '';
+    _autoRefreshTimer?.cancel();
+    _autoRefreshTimer = null;
     emit(PortfolioInitial());
+    developer.log('PortfolioCubit: Cleared');
   }
 
   /// Delete entire portfolio from server (called when user explicitly wants to clear it)
   Future<void> clearPortfolio() async {
-    if (_currentUserEmail == null) {
+    if (_currentUserEmail.isEmpty) {
       emit(PortfolioInitial());
       return;
     }
 
     try {
-      await portfolioRepository.clearUserPortfolio(_currentUserEmail!);
-      _currentUserEmail = null;
+      await portfolioRepository.clearUserPortfolio(_currentUserEmail);
+      _currentUserEmail = '';
+      _autoRefreshTimer?.cancel();
+      _autoRefreshTimer = null;
       emit(PortfolioInitial());
     } catch (e) {
       emit(PortfolioError('Failed to clear portfolio: ${e.toString()}'));

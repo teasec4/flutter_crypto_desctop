@@ -65,6 +65,10 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await authRepository.logout();
       currentUser = null;
+
+      // Clear portfolio and stop background syncs
+      portfolioCubit?.clear();
+
       emit(AuthInitial());
     } catch (e) {
       emit(AuthFailure('Logout failed: ${e.toString()}'));
