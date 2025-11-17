@@ -266,10 +266,43 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'Synchronized',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Theme toggle
+                      BlocBuilder<ThemeCubit, ThemeState>(
+                        builder: (context, themeState) {
+                          final isDark = themeState is ThemeDark;
+                          return Row(
+                            children: [
+                              Icon(
+                                isDark ? Icons.dark_mode : Icons.light_mode,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    context.read<ThemeCubit>().toggleTheme();
+                                  },
+                                  child: Text(
+                                    isDark ? 'Dark Mode' : 'Light Mode',
+                                    style: Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ),
+                              ),
+                              Switch(
+                                value: isDark,
+                                onChanged: (value) {
+                                  context.read<ThemeCubit>().toggleTheme();
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       Center(
@@ -278,14 +311,14 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               'v1.0.0',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               'Made with Flutter',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 fontSize: 10,
                               ),
                             ),

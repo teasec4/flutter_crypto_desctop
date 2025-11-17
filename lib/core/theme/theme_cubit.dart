@@ -36,4 +36,9 @@ class ThemeCubit extends Cubit<ThemeState> {
       emit(ThemeLight());
     }
   }
+
+  /// Toggle the theme between dark and light
+  Future<void> toggleTheme() async {
+    await setDarkMode(!isDark);
+  }
 }
