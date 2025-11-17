@@ -1,6 +1,7 @@
 import 'package:crypto_desctop/data/datasource/coin_local_datasource.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
+import 'package:crypto_desctop/domain/models/coin_chart_data.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 
 /// Repository implementation for coin data using cache-first strategy
@@ -111,5 +112,12 @@ class CoinRepositoryImpl implements CoinRepo {
       // If network fails and no cache, propagate the error
       rethrow;
     }
+  }
+
+  @override
+  Future<CoinChartData> getCoinChartData(String coinId, {int days = 30}) async {
+    // Always fetch fresh chart data from network
+    // (Chart data changes frequently and is not cached)
+    return remoteDatasource.getCoinChartData(coinId, days: days);
   }
 }

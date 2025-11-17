@@ -9,7 +9,9 @@ class CoinDetailLoading extends CoinDetailState {}
 /// State when coin details have been successfully loaded
 class CoinDetailLoaded extends CoinDetailState {
   final Coin coin;
-  CoinDetailLoaded(this.coin);
+  final CoinChartData? chartData;
+
+  CoinDetailLoaded(this.coin, {this.chartData});
 }
 
 /// State indicating an error occurred while loading coin details

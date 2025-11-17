@@ -1,4 +1,5 @@
 import 'package:crypto_desctop/domain/models/coin.dart';
+import 'package:crypto_desctop/domain/models/coin_chart_data.dart';
 
 /// Abstract interface for coin data repository
 abstract class CoinRepo {
@@ -16,4 +17,9 @@ abstract class CoinRepo {
 
   /// Fetches detailed information for a specific coin by ID
   Future<Coin> getCoin(String id);
+
+  /// Fetches historical price data for chart visualization
+  /// [coinId] - the CoinGecko coin ID
+  /// [days] - number of days of history (1, 7, 30, 90, 365, max)
+  Future<CoinChartData> getCoinChartData(String coinId, {int days = 30});
 }

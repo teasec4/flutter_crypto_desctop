@@ -1,9 +1,8 @@
 import 'dart:isolate';
-import 'dart:developer' as developer;
-import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
+import 'package:crypto_desctop/domain/models/coin_chart_data.dart';
 
 /// Implementation of CoinRemoteDatasource using isolates for background processing
 class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
@@ -40,5 +39,52 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
     }
 
     return (rawList as List).map((json) => Coin.fromJson(json)).toList();
+  }
+
+  @override
+  Future<CoinChartData> getCoinChartData(String coinId, {int days = 30}) async {
+    await _initializeWorker();
+
+    final receivePort = ReceivePort();
+    _workerSendPort!.send({
+      'coinId': coinId,
+      'days': days,
+      'sendPort': receivePort.sendPort,
+    });
+
+    final response = await receivePort.first;
+
+    if (response is Map && response.containsKey('error')) {
+      throw Exception('Failed to fetch chart data: ${response['error']}');
+    }
+
+    if (response is! Map<String, dynamic>) {
+      throw Exception('Invalid chart data format');
+    }
+
+    // Parse the prices array and extract data points
+    final prices = (response['prices'] as List).cast<List>();
+    final dataPoints = prices
+        .map((price) => ChartDataPoint.fromList(price))
+        .toList();
+
+    // Calculate min and max prices
+    double minPrice = double.infinity;
+    double maxPrice = double.negativeInfinity;
+    
+    for (final point in dataPoints) {
+      if (point.price < minPrice) minPrice = point.price;
+      if (point.price > maxPrice) maxPrice = point.price;
+    }
+
+    final currentPrice = dataPoints.isNotEmpty ? dataPoints.last.price : 0.0;
+
+    return CoinChartData(
+      coinId: coinId,
+      dataPoints: dataPoints,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      currentPrice: currentPrice,
+    );
   }
 }
