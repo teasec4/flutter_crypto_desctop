@@ -21,3 +21,10 @@ final class AuthFailure extends AuthState {
   final String message;
   AuthFailure(this.message);
 }
+
+/// State when user is authenticated but data is still loading
+/// Shows splash screen while portfolio and coins are being fetched
+final class AuthInitializing extends AuthState {
+  final User user;
+  AuthInitializing(this.user);
+}

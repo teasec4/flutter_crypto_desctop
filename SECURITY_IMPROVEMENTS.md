@@ -1,5 +1,12 @@
 # Security Improvements - Session 2
 
+## Overview
+Implemented security enhancements and UX improvements:
+- Network request timeouts for security
+- Authorization-based data loading
+- Empty data validation
+- Splash screen for smooth post-login flow
+
 ## Changes Made
 
 ### 1. Network Request Timeouts (`lib/core/isolate/worker_isolate.dart`)
@@ -65,11 +72,45 @@ New private methods:
 ✓ **Data Validation** - Invalid portfolio items handled gracefully
 ✓ **Privacy** - No data loaded for unauthenticated users
 
+### 6. Splash Screen on Login (`lib/presentation/pages/splash_page.dart` + `lib/router/app_router.dart` + `lib/presentation/pages/auth_state.dart`)
+
+**New files:**
+- `splash_page.dart` - Simple loading screen with app icon and message
+
+**Updated AuthState:**
+- Added `AuthInitializing` state to track data loading phase
+
+**Updated AuthCubit:**
+- `register()` and `login()` now emit `AuthInitializing` before loading data
+- Added `_initializeUserData()` method for parallel portfolio + coins loading
+- Uses `Future.wait()` to load portfolio and coins simultaneously
+- Emits `AuthAuthenticated` only after all data is loaded
+
+**Router updates (`app_router.dart`):**
+- Added `/splash` route that shows `SplashPage`
+- Router redirects to splash screen when `AuthInitializing` state is active
+- Automatically transitions to home after loading completes
+
+**Flow:**
+```
+Login → AuthLoading → AuthInitializing (show splash) → 
+Load Portfolio + Coins in parallel → AuthAuthenticated → 
+Router redirects to home
+```
+
+## UX Benefits
+
+✓ **Visual Feedback** - User sees splash screen during loading
+✓ **Parallel Loading** - Portfolio and coins load simultaneously (faster)
+✓ **Smooth Transition** - Automatic transition to home after load
+✓ **User-Friendly** - Shows personalized welcome message with user name
+
 ## Testing Recommendations
 
-1. Test login flow - verify coins load after auth
+1. Test login flow - verify splash shows and transitions to home
 2. Test logout flow - verify coins are cleared
 3. Test app restart - verify coins don't load until auth check completes
 4. Test empty portfolio - verify UI displays correctly
-5. Test network timeout - simulate slow/hanging requests
+5. Test network timeout - simulate slow/hanging requests (should show splash)
 6. Test invalid portfolio data - add items with NaN values
+7. Test splash appearance - verify gradient, icon, and animations
