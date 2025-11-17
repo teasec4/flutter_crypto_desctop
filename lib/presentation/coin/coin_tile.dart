@@ -31,6 +31,7 @@ class CoinTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -91,14 +92,17 @@ class CoinTile extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           // Add to portfolio button
-          IconButton(
-            iconSize: 20,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: const Icon(Icons.add_sharp),
-            onPressed: () => _showAddToPortfolioModal(context),
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: IconButton(
+              iconSize: 20,
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.add_sharp),
+              onPressed: () => _showAddToPortfolioModal(context),
+            ),
           ),
         ],
       ),

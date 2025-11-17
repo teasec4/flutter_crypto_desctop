@@ -48,9 +48,7 @@ class _ContentViewState extends State<ContentView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: BlocBuilder<CoinCubit, CoinState>(
+    return BlocBuilder<CoinCubit, CoinState>(
         builder: (context, state) {
           // Show loading spinner during initial load
           if (state is CoinInitial) {
@@ -126,7 +124,6 @@ class _ContentViewState extends State<ContentView> {
 
           return const SizedBox.shrink();
         },
-      ),
-    );
+      );
   }
 }

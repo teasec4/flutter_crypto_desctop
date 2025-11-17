@@ -36,52 +36,85 @@ class PortfolioPage extends StatelessWidget {
           }
 
           return RefreshIndicator(
-            onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
-            child: Column(
-              children: [
-                // Total portfolio value header
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Text(
-                        'Total Portfolio Value',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '\$${totalValue.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.headlineLarge,
-                      ),
-                    ],
-                  ),
-                ),
-                // Portfolio items list
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: state.items.length,
-                    itemBuilder: (context, index) {
-                      // Safely access items with bounds checking
-                      if (index >= state.items.length) {
-                        return const SizedBox();
-                      }
-                      final item = state.items[index];
-                      // Validate item before building
-                      if (_isValidPortfolioItem(item)) {
-                        return _buildPortfolioTile(context, item);
-                      }
-                      return const SizedBox();
-                    },
-                  ),
-                ),
-              ],
-            ),
+           onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
+           child: Column(
+             children: [
+               // Total portfolio value header card
+               Padding(
+                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                 child: Container(
+                   decoration: BoxDecoration(
+                     gradient: LinearGradient(
+                       colors: [
+                         Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                         Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
+                       ],
+                       begin: Alignment.topLeft,
+                       end: Alignment.bottomRight,
+                     ),
+                     borderRadius: BorderRadius.circular(16),
+                     border: Border.all(
+                       color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                     ),
+                   ),
+                   padding: const EdgeInsets.all(20),
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                         'Portfolio Balance',
+                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                           fontWeight: FontWeight.w500,
+                         ),
+                       ),
+                       const SizedBox(height: 12),
+                       Text(
+                         '\$${totalValue.toStringAsFixed(2)}',
+                         style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                           fontWeight: FontWeight.bold,
+                         ),
+                       ),
+                       const SizedBox(height: 12),
+                       Container(
+                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                         decoration: BoxDecoration(
+                           color: Colors.green.withValues(alpha: 0.1),
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                         child: Text(
+                           '${state.items.length} assets',
+                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                             color: Colors.green.shade500,
+                             fontWeight: FontWeight.bold,
+                           ),
+                         ),
+                       ),
+                     ],
+                   ),
+                 ),
+               ),
+               // Portfolio items list
+               Expanded(
+                 child: ListView.builder(
+                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                   itemCount: state.items.length,
+                   itemBuilder: (context, index) {
+                     // Safely access items with bounds checking
+                     if (index >= state.items.length) {
+                       return const SizedBox();
+                     }
+                     final item = state.items[index];
+                     // Validate item before building
+                     if (_isValidPortfolioItem(item)) {
+                       return _buildPortfolioTile(context, item, totalValue);
+                     }
+                     return const SizedBox();
+                   },
+                 ),
+               ),
+             ],
+           ),
           );
         } else if (state is PortfolioError) {
           return Center(
@@ -105,85 +138,105 @@ class PortfolioPage extends StatelessWidget {
   }
 
   /// Builds a tile widget for a single portfolio item
-  Widget _buildPortfolioTile(BuildContext context, PortfolioItem item) {
+  Widget _buildPortfolioTile(BuildContext context, PortfolioItem item, double totalValue) {
+    final percentage = totalValue > 0 ? (item.totalValue / totalValue * 100) : 0.0;
+    
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
           ),
+          color: Theme.of(context).colorScheme.surface,
         ),
-        // Cryptocurrency icon
-        leading: item.imageUrl != null
-            ? Image.network(
-                item.imageUrl!,
-                width: 40,
-                height: 40,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.currency_bitcoin, size: 40),
-              )
-            : const Icon(Icons.currency_bitcoin, size: 40),
-        // Coin symbol
-        title: Text(
-          item.symbol,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        // Coin name and amount held
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            if (item.name != null)
-              Text(
-                item.name!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: UIUtils.getSecondaryTextColor(context),
-                ),
-              ),
-            const SizedBox(height: 4),
-            Text(
-              'Amount: ${item.amount.toStringAsFixed(4)} ${item.symbol}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: UIUtils.getSecondaryTextColor(context),
-                fontWeight: FontWeight.bold,
-              ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          // Cryptocurrency icon
+          leading: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             ),
-          ],
-        ),
-        // Total value and current price
-        trailing: SizedBox(
-          width: 120,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            child: item.imageUrl != null
+                ? Image.network(
+                    item.imageUrl!,
+                    width: 40,
+                    height: 40,
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.currency_bitcoin, size: 24),
+                  )
+                : const Icon(Icons.currency_bitcoin, size: 24),
+          ),
+          // Coin symbol
+          title: Text(
+            item.symbol,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          // Coin name and amount held
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Total holding value
-              Text(
-                '\$${item.totalValue.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.shade500,
-                ),
-              ),
               const SizedBox(height: 4),
-              // Current price per coin
+              if (item.name != null)
+                Text(
+                  item.name!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: UIUtils.getSecondaryTextColor(context),
+                  ),
+                ),
+              const SizedBox(height: 4),
               Text(
-                '\$${item.currentPrice.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w500,
+                '${item.amount.toStringAsFixed(4)} ${item.symbol}',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: UIUtils.getSecondaryTextColor(context),
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
+          // Total value and percentage
+          trailing: SizedBox(
+            width: 140,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Total holding value
+                Text(
+                  '\$${item.totalValue.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                // Percentage of portfolio
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '${percentage.toStringAsFixed(1)}%',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Long press to remove asset from portfolio
+          onLongPress: () => _handleRemoveAsset(context, item.symbol),
         ),
-        // Long press to remove asset from portfolio
-        onLongPress: () => _handleRemoveAsset(context, item.symbol),
       ),
     );
   }
