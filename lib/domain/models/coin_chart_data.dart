@@ -3,10 +3,7 @@ class ChartDataPoint {
   final DateTime timestamp;
   final double price;
 
-  const ChartDataPoint({
-    required this.timestamp,
-    required this.price,
-  });
+  const ChartDataPoint({required this.timestamp, required this.price});
 
   factory ChartDataPoint.fromList(List<dynamic> data) {
     return ChartDataPoint(

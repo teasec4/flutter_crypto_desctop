@@ -45,6 +45,7 @@ dependencies:
   supabase_flutter: ^1.10.0
   shared_preferences: ^2.5.3
   fl_chart: ^0.69.0
+  uuid: ^4.0.0
 
 
 

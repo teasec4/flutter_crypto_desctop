@@ -36,85 +36,100 @@ class PortfolioPage extends StatelessWidget {
           }
 
           return RefreshIndicator(
-           onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
-           child: Column(
-             children: [
-               // Total portfolio value header card
-               Padding(
-                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                 child: Container(
-                   decoration: BoxDecoration(
-                     gradient: LinearGradient(
-                       colors: [
-                         Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                         Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
-                       ],
-                       begin: Alignment.topLeft,
-                       end: Alignment.bottomRight,
-                     ),
-                     borderRadius: BorderRadius.circular(16),
-                     border: Border.all(
-                       color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                     ),
-                   ),
-                   padding: const EdgeInsets.all(20),
-                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text(
-                         'Portfolio Balance',
-                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                           fontWeight: FontWeight.w500,
-                         ),
-                       ),
-                       const SizedBox(height: 12),
-                       Text(
-                         '\$${totalValue.toStringAsFixed(2)}',
-                         style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                           fontWeight: FontWeight.bold,
-                         ),
-                       ),
-                       const SizedBox(height: 12),
-                       Container(
-                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                         decoration: BoxDecoration(
-                           color: Colors.green.withValues(alpha: 0.1),
-                           borderRadius: BorderRadius.circular(8),
-                         ),
-                         child: Text(
-                           '${state.items.length} assets',
-                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                             color: Colors.green.shade500,
-                             fontWeight: FontWeight.bold,
-                           ),
-                         ),
-                       ),
-                     ],
-                   ),
-                 ),
-               ),
-               // Portfolio items list
-               Expanded(
-                 child: ListView.builder(
-                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                   itemCount: state.items.length,
-                   itemBuilder: (context, index) {
-                     // Safely access items with bounds checking
-                     if (index >= state.items.length) {
-                       return const SizedBox();
-                     }
-                     final item = state.items[index];
-                     // Validate item before building
-                     if (_isValidPortfolioItem(item)) {
-                       return _buildPortfolioTile(context, item, totalValue);
-                     }
-                     return const SizedBox();
-                   },
-                 ),
-               ),
-             ],
-           ),
+            onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
+            child: Column(
+              children: [
+                // Total portfolio value header card
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          Theme.of(
+                            context,
+                          ).colorScheme.secondary.withValues(alpha: 0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Portfolio Balance',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w500,
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '\$${totalValue.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.displaySmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${state.items.length} assets',
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: Colors.green.shade500,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Portfolio items list
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemCount: state.items.length,
+                    itemBuilder: (context, index) {
+                      // Safely access items with bounds checking
+                      if (index >= state.items.length) {
+                        return const SizedBox();
+                      }
+                      final item = state.items[index];
+                      // Validate item before building
+                      if (_isValidPortfolioItem(item)) {
+                        return _buildPortfolioTile(context, item, totalValue);
+                      }
+                      return const SizedBox();
+                    },
+                  ),
+                ),
+              ],
+            ),
           );
         } else if (state is PortfolioError) {
           return Center(
@@ -138,28 +153,41 @@ class PortfolioPage extends StatelessWidget {
   }
 
   /// Builds a tile widget for a single portfolio item
-  Widget _buildPortfolioTile(BuildContext context, PortfolioItem item, double totalValue) {
-    final percentage = totalValue > 0 ? (item.totalValue / totalValue * 100) : 0.0;
-    
+  Widget _buildPortfolioTile(
+    BuildContext context,
+    PortfolioItem item,
+    double totalValue,
+  ) {
+    final percentage = totalValue > 0
+        ? (item.totalValue / totalValue * 100)
+        : 0.0;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+            color: Theme.of(
+              context,
+            ).colorScheme.outline.withValues(alpha: 0.15),
           ),
           color: Theme.of(context).colorScheme.surface,
         ),
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
           // Cryptocurrency icon
           leading: Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
             ),
             child: item.imageUrl != null
                 ? Image.network(
@@ -218,9 +246,14 @@ class PortfolioPage extends StatelessWidget {
                 const SizedBox(height: 6),
                 // Percentage of portfolio
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -234,34 +267,19 @@ class PortfolioPage extends StatelessWidget {
               ],
             ),
           ),
-          // Long press to remove asset from portfolio
-          onLongPress: () => _handleRemoveAsset(context, item.symbol),
+          // Tap to open edit/delete modal
+          onTap: () => _showEditPortfolioModal(context, item),
         ),
       ),
     );
   }
 
-  /// Shows a confirmation dialog for removing an asset from portfolio
-  void _handleRemoveAsset(BuildContext context, String itemId) {
-    showDialog(
+  /// Shows a modal bottom sheet for editing or deleting a portfolio item
+  void _showEditPortfolioModal(BuildContext context, PortfolioItem item) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Asset?'),
-        content: const Text('Are you sure you want to remove this asset?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<PortfolioCubit>().removeAsset(itemId);
-              Navigator.pop(context);
-            },
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      builder: (context) => _EditPortfolioSheet(item: item),
     );
   }
 
@@ -327,6 +345,296 @@ class PortfolioPage extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Modal bottom sheet for editing or deleting a portfolio item
+class _EditPortfolioSheet extends StatefulWidget {
+  final PortfolioItem item;
+
+  const _EditPortfolioSheet({required this.item});
+
+  @override
+  State<_EditPortfolioSheet> createState() => _EditPortfolioSheetState();
+}
+
+class _EditPortfolioSheetState extends State<_EditPortfolioSheet> {
+  late TextEditingController _amountController;
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController(
+      text: widget.item.amount.toStringAsFixed(4),
+    );
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  /// Handles updating the amount
+  void _handleUpdateAmount() {
+    if (_formKey.currentState?.validate() ?? false) {
+      final newAmount = double.parse(_amountController.text);
+
+      setState(() => _isLoading = true);
+
+      final cubit = context.read<PortfolioCubit>();
+      cubit
+          .updateAssetAmount(widget.item.id, newAmount)
+          .then((_) {
+            if (mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${widget.item.symbol} amount updated'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          })
+          .onError((error, stackTrace) {
+            setState(() => _isLoading = false);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error: ${error.toString()}')),
+              );
+            }
+          });
+    }
+  }
+
+  /// Handles deleting the asset
+  void _handleDeleteAsset() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Asset?'),
+        content: Text(
+          'Remove ${widget.item.symbol} from your portfolio? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext); // Close dialog
+              setState(() => _isLoading = true);
+
+              final cubit = context.read<PortfolioCubit>();
+              cubit
+                  .removeAsset(widget.item.id)
+                  .then((_) {
+                    if (mounted) {
+                      Navigator.pop(context); // Close modal
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${widget.item.symbol} removed from portfolio',
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  })
+                  .onError((error, stackTrace) {
+                    setState(() => _isLoading = false);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${error.toString()}')),
+                      );
+                    }
+                  });
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 16,
+        right: 16,
+        top: 16,
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with coin info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    // Coin icon
+                    if (widget.item.imageUrl != null)
+                      Image.network(
+                        widget.item.imageUrl!,
+                        width: 40,
+                        height: 40,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.currency_bitcoin, size: 40),
+                      )
+                    else
+                      const Icon(Icons.currency_bitcoin, size: 40),
+                    const SizedBox(width: 12),
+                    // Coin name and symbol
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (widget.item.name != null)
+                            Text(
+                              widget.item.name!,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          Text(
+                            widget.item.symbol,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Current value
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '\$${widget.item.totalValue.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '\$${widget.item.currentPrice.toStringAsFixed(2)}/coin',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Amount input field
+              TextFormField(
+                controller: _amountController,
+                enabled: !_isLoading,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                autovalidateMode: AutovalidateMode.onUnfocus,
+                decoration: InputDecoration(
+                  labelText: 'Amount',
+                  hintText: 'Enter amount of ${widget.item.symbol}',
+                  prefixIcon: const Icon(Icons.calculate),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Amount is required';
+                  }
+                  try {
+                    final amount = double.parse(value);
+                    if (amount <= 0) {
+                      return 'Amount must be greater than 0';
+                    }
+                  } catch (e) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+
+              // Real-time total value preview
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Total value:',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _amountController,
+                      builder: (context, value, child) {
+                        final amount = double.tryParse(value.text) ?? 0;
+                        final totalValue = amount * widget.item.currentPrice;
+                        return Text(
+                          '\$${totalValue.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade500,
+                              ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Update button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleUpdateAmount,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Update Amount'),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Delete button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isLoading ? null : _handleDeleteAsset,
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('Delete Coin'),
+                  style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),

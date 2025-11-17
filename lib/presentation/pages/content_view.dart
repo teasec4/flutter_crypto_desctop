@@ -49,81 +49,81 @@ class _ContentViewState extends State<ContentView> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CoinCubit, CoinState>(
-        builder: (context, state) {
-          // Show loading spinner during initial load
-          if (state is CoinInitial) {
+      builder: (context, state) {
+        // Show loading spinner during initial load
+        if (state is CoinInitial) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // Show error message if initial load fails
+        if (state is CoinError && state.previousCoins.isEmpty) {
+          return Center(child: Text('Error: ${state.message}'));
+        }
+
+        // Handle CoinLoading state
+        if (state is CoinLoading) {
+          final coins = state.coins;
+
+          // Initial loading (no coins yet)
+          if (coins.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Show error message if initial load fails
-          if (state is CoinError && state.previousCoins.isEmpty) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-
-          // Handle CoinLoading state
-          if (state is CoinLoading) {
-            final coins = state.coins;
-
-            // Initial loading (no coins yet)
-            if (coins.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            // Refreshing or loading more - show coins with loading indicator at bottom
-            return RefreshIndicator(
-              onRefresh: () async {
-                await context.read<CoinCubit>().refreshCoins();
-              },
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: coins.length + 1,
-                itemBuilder: (context, index) {
-                  // Show loading indicator at the bottom
-                  if (index == coins.length) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
+          // Refreshing or loading more - show coins with loading indicator at bottom
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<CoinCubit>().refreshCoins();
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: coins.length + 1,
+              itemBuilder: (context, index) {
+                // Show loading indicator at the bottom
+                if (index == coins.length) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
-                    );
-                  }
+                    ),
+                  );
+                }
 
-                  final coin = coins[index];
-                  return CoinTile(coin: coin);
-                },
-              ),
-            );
-          }
-
-          // Handle CoinLoaded state
-          if (state is CoinLoaded) {
-            final coins = state.coins;
-
-            if (coins.isEmpty) {
-              return const Center(child: Text('No coins found'));
-            }
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                await context.read<CoinCubit>().refreshCoins();
+                final coin = coins[index];
+                return CoinTile(coin: coin);
               },
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: coins.length,
-                itemBuilder: (context, index) {
-                  final coin = coins[index];
-                  return CoinTile(coin: coin);
-                },
-              ),
-            );
+            ),
+          );
+        }
+
+        // Handle CoinLoaded state
+        if (state is CoinLoaded) {
+          final coins = state.coins;
+
+          if (coins.isEmpty) {
+            return const Center(child: Text('No coins found'));
           }
 
-          return const SizedBox.shrink();
-        },
-      );
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<CoinCubit>().refreshCoins();
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: coins.length,
+              itemBuilder: (context, index) {
+                final coin = coins[index];
+                return CoinTile(coin: coin);
+              },
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
   }
 }

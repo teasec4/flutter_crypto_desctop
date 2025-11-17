@@ -23,11 +23,14 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
           .from(AppConstants.portfolioTable)
           .select()
           .eq('user_id', userId)
-          .timeout(AppConstants.networkTimeout, onTimeout: () {
-        throw TimeoutException(
-          'Timeout while fetching portfolio items after ${AppConstants.networkTimeout.inSeconds}s',
-        );
-      });
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () {
+              throw TimeoutException(
+                'Timeout while fetching portfolio items after ${AppConstants.networkTimeout.inSeconds}s',
+              );
+            },
+          );
 
       return (response as List)
           .map((item) => PortfolioItem.fromJson(item))
@@ -46,19 +49,77 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
         throw Exception('User not authenticated');
       }
 
-      await _supabase
+      developer.log(
+        'PortfolioRemoteDataSource: Adding/updating item ${item.symbol} with amount ${item.amount}',
+      );
+
+      // First, check if this symbol already exists for this user
+      final existingItem = await _supabase
           .from(AppConstants.portfolioTable)
-          .insert({
-            'user_id': userId,
-            'symbol': item.symbol,
-            'amount': item.amount,
-            'added_at': item.addedAt.toIso8601String(),
-          })
-          .timeout(AppConstants.networkTimeout, onTimeout: () {
-        throw TimeoutException(
-          'Timeout while adding portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+          .select('id, amount')
+          .eq('symbol', item.symbol)
+          .eq('user_id', userId)
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () {
+              throw TimeoutException(
+                'Timeout while checking existing portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+              );
+            },
+          );
+
+      if (existingItem.isNotEmpty) {
+        // Item with this symbol exists - add new amount to existing amount
+        final existingId = existingItem[0]['id'] as String;
+        final currentAmount =
+            (existingItem[0]['amount'] as num?)?.toDouble() ?? 0.0;
+        final newTotalAmount = currentAmount + item.amount;
+
+        developer.log(
+          'PortfolioRemoteDataSource: ${item.symbol} EXISTS with id=$existingId, amount=$currentAmount, adding ${item.amount} → total $newTotalAmount',
         );
-      });
+
+        await _supabase
+            .from(AppConstants.portfolioTable)
+            .update({'amount': newTotalAmount})
+            .eq('id', existingId)
+            .eq('user_id', userId)
+            .timeout(
+              AppConstants.networkTimeout,
+              onTimeout: () {
+                throw TimeoutException(
+                  'Timeout while updating portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+                );
+              },
+            );
+      } else {
+        // Item doesn't exist - create new record with UUID
+        developer.log(
+          'PortfolioRemoteDataSource: ${item.symbol} is NEW, creating record with id=${item.id}, amount=${item.amount}',
+        );
+
+        await _supabase
+            .from(AppConstants.portfolioTable)
+            .insert({
+              'id': item.id,
+              'user_id': userId,
+              'symbol': item.symbol,
+              'amount': item.amount,
+              'added_at': item.addedAt.toIso8601String(),
+            })
+            .timeout(
+              AppConstants.networkTimeout,
+              onTimeout: () {
+                throw TimeoutException(
+                  'Timeout while adding portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+                );
+              },
+            );
+      }
+
+      developer.log(
+        'PortfolioRemoteDataSource: Item ${item.symbol} added/updated successfully',
+      );
     } catch (e) {
       developer.log('PortfolioRemoteDataSource: addPortfolioItem error: $e');
       throw Exception('Failed to add portfolio item: ${e.toString()}');
@@ -77,18 +138,31 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
         throw Exception('User not authenticated');
       }
 
+      developer.log(
+        'PortfolioRemoteDataSource: Updating item $itemId with amount $newAmount',
+      );
+
       await _supabase
           .from(AppConstants.portfolioTable)
           .update({'amount': newAmount})
-          .eq('symbol', itemId)
+          .eq('id', itemId)
           .eq('user_id', userId)
-          .timeout(AppConstants.networkTimeout, onTimeout: () {
-        throw TimeoutException(
-          'Timeout while updating portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
-        );
-      });
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () {
+              throw TimeoutException(
+                'Timeout while updating portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+              );
+            },
+          );
+
+      developer.log(
+        'PortfolioRemoteDataSource: Item $itemId updated successfully',
+      );
     } catch (e) {
-      developer.log('PortfolioRemoteDataSource: updatePortfolioItemAmount error: $e');
+      developer.log(
+        'PortfolioRemoteDataSource: updatePortfolioItemAmount error: $e',
+      );
       throw Exception('Failed to update portfolio item: ${e.toString()}');
     }
   }
@@ -101,16 +175,25 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
         throw Exception('User not authenticated');
       }
 
+      developer.log('PortfolioRemoteDataSource: Deleting item $itemId');
+
       await _supabase
           .from(AppConstants.portfolioTable)
           .delete()
-          .eq('symbol', itemId)
+          .eq('id', itemId)
           .eq('user_id', userId)
-          .timeout(AppConstants.networkTimeout, onTimeout: () {
-        throw TimeoutException(
-          'Timeout while removing portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
-        );
-      });
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () {
+              throw TimeoutException(
+                'Timeout while removing portfolio item after ${AppConstants.networkTimeout.inSeconds}s',
+              );
+            },
+          );
+
+      developer.log(
+        'PortfolioRemoteDataSource: Item $itemId deleted successfully',
+      );
     } catch (e) {
       developer.log('PortfolioRemoteDataSource: removePortfolioItem error: $e');
       throw Exception('Failed to remove portfolio item: ${e.toString()}');
@@ -129,11 +212,14 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
           .from(AppConstants.portfolioTable)
           .delete()
           .eq('user_id', userId)
-          .timeout(AppConstants.networkTimeout, onTimeout: () {
-        throw TimeoutException(
-          'Timeout while clearing portfolio after ${AppConstants.networkTimeout.inSeconds}s',
-        );
-      });
+          .timeout(
+            AppConstants.networkTimeout,
+            onTimeout: () {
+              throw TimeoutException(
+                'Timeout while clearing portfolio after ${AppConstants.networkTimeout.inSeconds}s',
+              );
+            },
+          );
     } catch (e) {
       developer.log('PortfolioRemoteDataSource: clearUserPortfolio error: $e');
       throw Exception('Failed to clear portfolio: ${e.toString()}');

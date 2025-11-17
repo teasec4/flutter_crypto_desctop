@@ -33,7 +33,10 @@ class CoinTile extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 4,
+          ),
           minVerticalPadding: 0,
           dense: true,
           leading: Row(
@@ -83,7 +86,10 @@ class CoinTile extends StatelessWidget {
                   // Current price
                   Text(
                     '\$${coin.price.toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                   // 24 hour price change percentage
                   Text(
@@ -120,7 +126,9 @@ class CoinTile extends StatelessWidget {
           child: Divider(
             height: 1,
             thickness: 0.5,
-            color: UIUtils.getSecondaryTextColor(context).withValues(alpha: 0.1),
+            color: UIUtils.getSecondaryTextColor(
+              context,
+            ).withValues(alpha: 0.1),
           ),
         ),
       ],
@@ -182,9 +190,8 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
           return;
         }
 
-        // Initialize portfolio cubit with user email
-        widget.portfolioCubit.initializeUser(userEmail);
-
+        // Don't re-initialize if already initialized
+        // Just add the asset directly
         widget.portfolioCubit
             .addAsset(widget.coin.symbol, amount)
             .then((_) {
@@ -203,6 +210,7 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
             .onError((error, stackTrace) {
               setState(() => _isLoading = false);
               if (mounted) {
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error: ${error.toString()}')),
                 );

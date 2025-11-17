@@ -15,15 +15,15 @@ class CoinDetailCubit extends Cubit<CoinDetailState> {
   Future<void> loadCoin(String coinId, {int chartDays = 30}) async {
     try {
       emit(CoinDetailLoading());
-      
+
       // Load coin and chart data in parallel
       final coinFuture = coinRepo.getCoin(coinId);
       final chartFuture = coinRepo.getCoinChartData(coinId, days: chartDays);
-      
+
       final results = await Future.wait([coinFuture, chartFuture]);
       final coin = results[0] as Coin;
       final chartData = results[1];
-      
+
       emit(CoinDetailLoaded(coin, chartData: chartData as dynamic));
     } catch (e) {
       emit(CoinDetailError(e.toString()));

@@ -265,9 +265,11 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(width: 4),
                           Text(
                             'Synchronized',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
                           ),
                         ],
                       ),
@@ -290,7 +292,9 @@ class _HomePageState extends State<HomePage> {
                                   },
                                   child: Text(
                                     isDark ? 'Dark Mode' : 'Light Mode',
-                                    style: Theme.of(context).textTheme.bodyMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium,
                                   ),
                                 ),
                               ),
@@ -310,17 +314,25 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               'v1.0.0',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                  ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               'Made with Flutter',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                                fontSize: 10,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 10,
+                                  ),
                             ),
                           ],
                         ),

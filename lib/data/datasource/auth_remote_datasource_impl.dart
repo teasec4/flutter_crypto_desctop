@@ -19,10 +19,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     try {
       final response = await _supabase.auth
-          .signUp(
-            email: email,
-            password: password,
-          )
+          .signUp(email: email, password: password)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () => throw TimeoutException(
@@ -90,10 +87,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<user_model.User> _loginWithRetry(String email, String password) async {
     try {
       final response = await _supabase.auth
-          .signInWithPassword(
-            email: email,
-            password: password,
-          )
+          .signInWithPassword(email: email, password: password)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () => throw TimeoutException(

@@ -71,7 +71,7 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
     // Calculate min and max prices
     double minPrice = double.infinity;
     double maxPrice = double.negativeInfinity;
-    
+
     for (final point in dataPoints) {
       if (point.price < minPrice) minPrice = point.price;
       if (point.price > maxPrice) maxPrice = point.price;

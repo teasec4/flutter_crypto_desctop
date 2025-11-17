@@ -5,6 +5,7 @@ import 'package:crypto_desctop/domain/models/portfolio_item.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:crypto_desctop/domain/repository/portfolio_repo.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'portfolio_state.dart';
 
@@ -169,31 +170,47 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
   /// Add new asset to portfolio
   Future<void> addAsset(String symbol, double amount) async {
+    developer.log(
+      'PortfolioCubit: addAsset called with symbol=$symbol, amount=$amount, currentUserEmail=$_currentUserEmail',
+    );
+
     if (_currentUserEmail.isEmpty) {
+      developer.log('PortfolioCubit: ERROR - User email is empty!');
       emit(PortfolioError('User not authenticated'));
       return;
     }
 
     try {
+      // Generate UUID for the item
+      final uuid = const Uuid().v4();
+
       final item = PortfolioItem(
-        id: symbol.toLowerCase(),
+        id: uuid, // Use UUID instead of symbol
         symbol: symbol.toUpperCase(),
         amount: amount,
         addedAt: DateTime.now(),
       );
 
+      developer.log(
+        'PortfolioCubit: Adding item to repository: id=${item.id}, symbol=${item.symbol}, amount=${item.amount}',
+      );
       await portfolioRepository.addPortfolioItem(_currentUserEmail, item);
-      emit(PortfolioItemAdded(item));
 
-      // Reload portfolio after adding
-      developer.log('PortfolioCubit: Asset added, reloading portfolio');
-      await _loadPortfolioNetwork(showLoading: false);
+      developer.log(
+        'PortfolioCubit: Item added successfully, reloading portfolio',
+      );
+      // Reload portfolio after adding with fresh data from server
+      // Use forceFresh=true to ensure we get latest data from server
+      await _loadPortfolioNetwork(showLoading: true, forceFresh: true);
+      developer.log('PortfolioCubit: Portfolio reloaded after add');
     } catch (e) {
+      developer.log('PortfolioCubit: ERROR in addAsset - $e');
       emit(PortfolioError('Failed to add asset: ${e.toString()}'));
     }
   }
 
   /// Update amount of existing portfolio item
+  /// Returns the updated portfolio items after reload
   Future<void> updateAssetAmount(String itemId, double newAmount) async {
     if (_currentUserEmail.isEmpty) {
       emit(PortfolioError('User not authenticated'));
@@ -207,9 +224,10 @@ class PortfolioCubit extends Cubit<PortfolioState> {
         newAmount,
       );
 
-      // Reload portfolio after updating
+      // Reload portfolio after updating with fresh data from server
       developer.log('PortfolioCubit: Asset updated, reloading portfolio');
-      await _loadPortfolioNetwork(showLoading: false);
+      // Use forceFresh=true to ensure we get latest data from server
+      await _loadPortfolioNetwork(showLoading: true, forceFresh: true);
     } catch (e) {
       emit(PortfolioError('Failed to update asset: ${e.toString()}'));
     }
@@ -224,11 +242,11 @@ class PortfolioCubit extends Cubit<PortfolioState> {
 
     try {
       await portfolioRepository.removePortfolioItem(_currentUserEmail, itemId);
-      emit(PortfolioItemRemoved(itemId));
 
-      // Reload portfolio after removing
+      // Reload portfolio after removing with fresh data from server
       developer.log('PortfolioCubit: Asset removed, reloading portfolio');
-      await _loadPortfolioNetwork(showLoading: false);
+      // Use forceFresh=true to ensure we get latest data from server
+      await _loadPortfolioNetwork(showLoading: true, forceFresh: true);
     } catch (e) {
       emit(PortfolioError('Failed to remove asset: ${e.toString()}'));
     }

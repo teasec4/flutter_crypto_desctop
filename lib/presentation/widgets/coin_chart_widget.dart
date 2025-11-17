@@ -51,15 +51,9 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Price Chart',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Price Chart', style: Theme.of(context).textTheme.titleMedium),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: isPositive
                     ? Colors.green.withValues(alpha: 0.1)
@@ -68,10 +62,7 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
               ),
               child: Text(
                 '${isPositive ? '+' : ''}${chartData.changePercentage.toStringAsFixed(2)}%',
-                style: TextStyle(
-                  color: lineColor,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: lineColor, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -149,10 +140,8 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
                     getTitlesWidget: (value, meta) {
                       if (value.toInt() % 5 == 0) {
                         final index = value.toInt();
-                        if (index >= 0 &&
-                            index < chartData.dataPoints.length) {
-                          final date = chartData.dataPoints[index]
-                              .timestamp;
+                        if (index >= 0 && index < chartData.dataPoints.length) {
+                          final date = chartData.dataPoints[index].timestamp;
                           return Text(
                             '${date.month}/${date.day}',
                             style: const TextStyle(fontSize: 10),
@@ -185,8 +174,7 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
               ),
               borderData: FlBorderData(show: false),
               minX: 0,
-              maxX:
-                  (chartData.dataPoints.length - 1).toDouble(),
+              maxX: (chartData.dataPoints.length - 1).toDouble(),
               minY: chartData.minPrice * 0.95,
               maxY: chartData.maxPrice * 1.05,
               lineBarsData: [
@@ -196,9 +184,7 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
                   color: lineColor,
                   barWidth: 2,
                   isStrokeCapRound: true,
-                  dotData: FlDotData(
-                    show: false,
-                  ),
+                  dotData: FlDotData(show: false),
                   belowBarData: BarAreaData(
                     show: true,
                     color: lineColor.withValues(alpha: 0.1),
@@ -217,10 +203,7 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Low',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                Text('Low', style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 4),
                 Text(
                   '\$${chartData.minPrice.toStringAsFixed(2)}',
@@ -231,27 +214,20 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Current',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                Text('Current', style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 4),
                 Text(
                   '\$${chartData.currentPrice.toStringAsFixed(2)}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  'High',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                Text('High', style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 4),
                 Text(
                   '\$${chartData.maxPrice.toStringAsFixed(2)}',
@@ -269,10 +245,7 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
   List<FlSpot> _generateSpots(CoinChartData chartData) {
     return List.generate(
       chartData.dataPoints.length,
-      (index) => FlSpot(
-        index.toDouble(),
-        chartData.dataPoints[index].price,
-      ),
+      (index) => FlSpot(index.toDouble(), chartData.dataPoints[index].price),
     );
   }
 }
@@ -300,9 +273,7 @@ class _TimeButton extends StatelessWidget {
             ? Theme.of(context).primaryColor
             : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 16),
       ),
       child: Text(label),

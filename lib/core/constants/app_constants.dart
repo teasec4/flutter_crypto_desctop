@@ -16,4 +16,3 @@ class AppConstants {
   // Portfolio constants
   static const String portfolioTable = 'portfolio';
 }
-

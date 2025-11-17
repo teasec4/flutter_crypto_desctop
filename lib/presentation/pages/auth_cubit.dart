@@ -123,22 +123,20 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       // Load portfolio with timeout
       final portfolioFuture = _loadPortfolioWithTimeout(email);
-      
-      await Future.wait([
-        portfolioFuture,
-        _loadCoinsAsync(),
-      ]);
+
+      await Future.wait([portfolioFuture, _loadCoinsAsync()]);
     } catch (e) {
       debugPrint('Error initializing user data: $e');
       // Don't fail the login, just log the error
     }
   }
-  
+
   /// Load portfolio with timeout to prevent hanging
   Future<void> _loadPortfolioWithTimeout(String email) async {
     try {
-      final portfolioLoad = portfolioCubit?.loadPortfolioInitial(email) ?? Future.value();
-      
+      final portfolioLoad =
+          portfolioCubit?.loadPortfolioInitial(email) ?? Future.value();
+
       // Add 5 second timeout to prevent hanging
       await portfolioLoad.timeout(
         const Duration(seconds: 5),
