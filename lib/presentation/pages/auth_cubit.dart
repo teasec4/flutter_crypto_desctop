@@ -1,15 +1,22 @@
 import 'package:bloc/bloc.dart';
 import 'package:crypto_desctop/domain/models/user_model.dart';
 import 'package:crypto_desctop/domain/repository/auth_repo.dart';
+import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:flutter/foundation.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository authRepository;
+  PortfolioCubit? portfolioCubit;
   User? currentUser;
 
   AuthCubit(this.authRepository) : super(AuthInitial());
+
+  /// Set portfolio cubit reference for loading portfolio on auth
+  void setPortfolioCubit(PortfolioCubit cubit) {
+    portfolioCubit = cubit;
+  }
 
   /// Register new user
   Future<void> register(
@@ -24,6 +31,8 @@ class AuthCubit extends Cubit<AuthState> {
       final isLoggedIn = await authRepository.isUserLoggedIn();
       if (isLoggedIn && currentUser != null) {
         emit(AuthAuthenticated(currentUser!));
+        // Load portfolio for new user
+        portfolioCubit?.initializeUser(email);
       } else {
         emit(AuthFailure('Registration succeeded but user is not logged in'));
       }
@@ -39,6 +48,8 @@ class AuthCubit extends Cubit<AuthState> {
       currentUser = await authRepository.login(email, password);
       if (currentUser != null) {
         emit(AuthAuthenticated(currentUser!));
+        // Load portfolio for logged in user
+        portfolioCubit?.initializeUser(email);
       } else {
         emit(AuthFailure('Login failed: user data not available'));
       }
@@ -68,6 +79,8 @@ class AuthCubit extends Cubit<AuthState> {
         currentUser = await authRepository.getCurrentUser();
         if (currentUser != null) {
           emit(AuthAuthenticated(currentUser!));
+          // Load portfolio on app startup if user is already logged in
+          portfolioCubit?.initializeUser(currentUser!.email);
         } else {
           emit(AuthInitial());
         }

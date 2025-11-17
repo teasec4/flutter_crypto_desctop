@@ -6,29 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Displays the user's cryptocurrency portfolio with holdings and total value
-class PortfolioPage extends StatefulWidget {
+class PortfolioPage extends StatelessWidget {
   const PortfolioPage({super.key});
-
-  @override
-  State<PortfolioPage> createState() => _PortfolioPageState();
-}
-
-class _PortfolioPageState extends State<PortfolioPage> {
-  @override
-  void initState() {
-    super.initState();
-    _loadPortfolioData();
-  }
-
-  /// Loads the portfolio data for the current authenticated user
-  void _loadPortfolioData() {
-    final authCubit = context.read<AuthCubit>();
-    final userEmail = authCubit.getCurrentUserEmail();
-
-    if (userEmail != null) {
-      context.read<PortfolioCubit>().loadPortfolio(userEmail);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,63 +23,81 @@ class _PortfolioPageState extends State<PortfolioPage> {
           }
 
           if (state.items.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Text(
-                  'No assets in portfolio. Add coins from the home page!',
-                  style: Theme.of(context).textTheme.bodyLarge,
+            return RefreshIndicator(
+              onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Text(
+                    'No assets in portfolio. Add coins from the home page!',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ),
               ),
             );
           }
 
-          return Column(
-            children: [
-              // Total portfolio value header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Total Portfolio Value',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                        fontWeight: FontWeight.w500,
+          return RefreshIndicator(
+            onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
+            child: Column(
+              children: [
+                // Total portfolio value header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Total Portfolio Value',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '\$${totalValue.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        '\$${totalValue.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.headlineLarge,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // Portfolio items list
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: state.items.length,
-                  itemBuilder: (context, index) {
-                    final item = state.items[index];
-                    return _buildPortfolioTile(context, item);
-                  },
+                // Portfolio items list
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: state.items.length,
+                    itemBuilder: (context, index) {
+                      final item = state.items[index];
+                      return _buildPortfolioTile(context, item);
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         } else if (state is PortfolioError) {
-          return Center(child: Text('Error: ${state.message}'));
-        }
-        return const SizedBox();
-      },
-    );
-  }
+           return Center(
+             child: Column(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Text('Error: ${state.message}'),
+                 const SizedBox(height: 16),
+                 ElevatedButton(
+                   onPressed: () => context.read<PortfolioCubit>().refreshPortfolio(),
+                   child: const Text('Retry'),
+                 ),
+               ],
+             ),
+           );
+         }
+         return const SizedBox();
+       },
+     );
+   }
 
-  /// Builds a tile widget for a single portfolio item
-  Widget _buildPortfolioTile(BuildContext context, PortfolioItem item) {
+        /// Builds a tile widget for a single portfolio item
+        Widget _buildPortfolioTile(BuildContext context, PortfolioItem item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: ListTile(

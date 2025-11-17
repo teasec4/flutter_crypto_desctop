@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:bloc/bloc.dart';
 import 'package:crypto_desctop/domain/models/portfolio_item.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
@@ -8,34 +10,116 @@ part 'portfolio_state.dart';
 
 /// Cubit for managing user cryptocurrency portfolio
 /// Handles portfolio operations: loading, adding, updating, and removing assets
+/// Caches portfolio data to avoid unnecessary network requests
 class PortfolioCubit extends Cubit<PortfolioState> {
   final PortfolioRepository portfolioRepository;
   final CoinRepo coinRepo;
   String? _currentUserEmail;
+  Timer? _autoRefreshTimer;
+  DateTime? _lastLoadTime;
+  static const Duration autoRefreshInterval = Duration(minutes: 5);
 
   PortfolioCubit({required this.portfolioRepository, required this.coinRepo})
     : super(PortfolioInitial());
 
-  /// Initialize user email (without loading portfolio)
-  void initializeUser(String userEmail) {
-    _currentUserEmail = userEmail;
+  @override
+  Future<void> close() {
+    _autoRefreshTimer?.cancel();
+    return super.close();
   }
 
-  /// Set current user email and load portfolio
-  Future<void> loadPortfolio(String userEmail) async {
-    _currentUserEmail = userEmail;
-    emit(PortfolioLoading());
+  /// Starts auto-refresh timer - updates portfolio every 5 minutes in background
+  void _startAutoRefreshTimer() {
+    _autoRefreshTimer?.cancel();
+    _autoRefreshTimer = Timer.periodic(autoRefreshInterval, (_) {
+      developer.log('PortfolioCubit: Auto-refresh timer triggered');
+      _loadPortfolioNetwork(showLoading: false);
+    });
+  }
 
+  /// Initialize user email and load portfolio on app startup
+  Future<void> initializeUser(String userEmail) async {
+    _currentUserEmail = userEmail;
+    await loadPortfolioInitial(userEmail);
+  }
+
+  /// Initial load - tries cache first, then network in background
+  /// Called when user logs in or app starts
+  Future<void> loadPortfolioInitial(String userEmail) async {
+    developer.log('PortfolioCubit: loadPortfolioInitial called');
+    _currentUserEmail = userEmail;
+    
+    // Start auto-refresh timer when data is loaded
+    _startAutoRefreshTimer();
+    
+    // Try to load from cache first
+    await _loadPortfolioFromCache(userEmail);
+    
+    // Then load from network (with loading indicator)
+    await _loadPortfolioNetwork(showLoading: true, userEmail: userEmail);
+  }
+
+  /// Loads portfolio from cache (non-blocking, shows immediately)
+  Future<void> _loadPortfolioFromCache(String userEmail) async {
     try {
       final items = await portfolioRepository.getPortfolioItems(userEmail);
+      if (items.isNotEmpty) {
+        developer.log('PortfolioCubit: Loaded ${items.length} items from cache');
+        final enrichedItems = await _enrichItemsWithPrices(items);
+        emit(PortfolioLoaded(enrichedItems));
+      }
+    } catch (e) {
+      developer.log('PortfolioCubit: Cache load failed - $e');
+    }
+  }
+
+  /// Loads portfolio from network with loading state
+  /// [showLoading] - if true, emits PortfolioLoading state; if false, silently updates in background
+  Future<void> _loadPortfolioNetwork({
+    bool showLoading = true,
+    String? userEmail,
+  }) async {
+    final email = userEmail ?? _currentUserEmail;
+    if (email == null) return;
+
+    try {
+      final previousItems = (state is PortfolioLoaded) 
+          ? (state as PortfolioLoaded).items 
+          : <PortfolioItem>[];
+      
+      // Only show loading if explicitly requested
+      if (showLoading) {
+        emit(PortfolioLoading());
+      }
+      
+      final items = await portfolioRepository.getPortfolioItems(email);
+      _lastLoadTime = DateTime.now();
 
       // Fetch current prices for all portfolio items
       final enrichedItems = await _enrichItemsWithPrices(items);
 
+      developer.log('PortfolioCubit: Loaded ${enrichedItems.length} items from network');
       emit(PortfolioLoaded(enrichedItems));
     } catch (e) {
-      emit(PortfolioError('Failed to load portfolio: ${e.toString()}'));
+      developer.log('PortfolioCubit: Network load failed - $e');
+      final previousItems = (state is PortfolioLoading) 
+          ? <PortfolioItem>[] 
+          : (state is PortfolioLoaded) ? (state as PortfolioLoaded).items : <PortfolioItem>[];
+      
+      if (previousItems.isEmpty && state is! PortfolioLoaded) {
+        // If no previous data and initial load failed
+        emit(PortfolioError('Failed to load portfolio: ${e.toString()}'));
+      } else {
+        // If we have cached data, keep showing it (silent error)
+        developer.log('PortfolioCubit: Network failed but keeping cached data');
+      }
     }
+  }
+
+  /// Manual refresh - force network update with loading indicator
+  Future<void> refreshPortfolio() async {
+    developer.log('PortfolioCubit: refreshPortfolio called (manual)');
+    await _loadPortfolioNetwork(showLoading: true);
   }
 
   /// Fetch current prices and info for portfolio items
@@ -89,7 +173,8 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       emit(PortfolioItemAdded(item));
 
       // Reload portfolio after adding
-      await loadPortfolio(_currentUserEmail!);
+      developer.log('PortfolioCubit: Asset added, reloading portfolio');
+      await _loadPortfolioNetwork(showLoading: false);
     } catch (e) {
       emit(PortfolioError('Failed to add asset: ${e.toString()}'));
     }
@@ -110,7 +195,8 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       );
 
       // Reload portfolio after updating
-      await loadPortfolio(_currentUserEmail!);
+      developer.log('PortfolioCubit: Asset updated, reloading portfolio');
+      await _loadPortfolioNetwork(showLoading: false);
     } catch (e) {
       emit(PortfolioError('Failed to update asset: ${e.toString()}'));
     }
@@ -128,7 +214,8 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       emit(PortfolioItemRemoved(itemId));
 
       // Reload portfolio after removing
-      await loadPortfolio(_currentUserEmail!);
+      developer.log('PortfolioCubit: Asset removed, reloading portfolio');
+      await _loadPortfolioNetwork(showLoading: false);
     } catch (e) {
       emit(PortfolioError('Failed to remove asset: ${e.toString()}'));
     }

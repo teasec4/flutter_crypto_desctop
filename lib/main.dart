@@ -70,6 +70,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) {
             final cubit = AuthCubit(getIt());
+            // Set portfolio cubit reference so AuthCubit can trigger portfolio load
+            cubit.setPortfolioCubit(context.read<PortfolioCubit>());
             cubit.checkAuthStatus();
             return cubit;
           },

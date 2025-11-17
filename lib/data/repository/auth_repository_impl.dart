@@ -27,20 +27,20 @@ class AuthRepositoryImpl implements AuthRepository {
     String password,
     String displayName,
   ) async {
-    final firebaseUser = await remoteDataSource.register(
+    final remoteDbUser = await remoteDataSource.register(
       email,
       password,
       displayName,
     );
-    await localDataSource.saveUser(firebaseUser);
-    return firebaseUser;
+    await localDataSource.saveUser(remoteDbUser);
+    return remoteDbUser;
   }
 
   @override
   Future<User> login(String email, String password) async {
-    final firebaseUser = await remoteDataSource.login(email, password);
-    await localDataSource.saveUser(firebaseUser);
-    return firebaseUser;
+    final remoteDbUser = await remoteDataSource.login(email, password);
+    await localDataSource.saveUser(remoteDbUser);
+    return remoteDbUser;
   }
 
   @override
