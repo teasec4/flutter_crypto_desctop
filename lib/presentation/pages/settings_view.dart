@@ -46,8 +46,8 @@ class SettingsView extends StatelessWidget {
                 subtitle: const Text('Switch theme'),
                 trailing: Switch(
                   value: isDark,
-                  onChanged: (value) {
-                    context.read<ThemeCubit>().setDarkMode(value);
+                  onChanged: (value) async {
+                    await context.read<ThemeCubit>().setDarkMode(value);
                   },
                 ),
               );

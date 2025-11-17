@@ -20,6 +20,8 @@ import 'package:path_provider/path_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  ThemeCubit themeCubit = ThemeCubit();
+
   try {
     // init Supabase
     await Supabase.initialize(
@@ -41,21 +43,26 @@ void main() async {
     ], directory: isarDir.path);
 
     setupServiceLocator(isar);
+
+    // Load saved theme preference
+    await themeCubit.initialize();
   } catch (e) {
     debugPrint('Error initializing app: $e');
   }
 
-  runApp(const MyApp());
+  runApp(MyApp(themeCubit: themeCubit));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeCubit themeCubit;
+
+  const MyApp({required this.themeCubit, super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider.value(value: themeCubit),
         BlocProvider(
           create: (context) {
             final coinCubit = CoinCubit(getIt<CoinRepo>());
