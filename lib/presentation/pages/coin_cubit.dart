@@ -73,8 +73,9 @@ class CoinCubit extends Cubit<CoinState> {
     // Try to load from cache first
     await _loadCoinsCached();
 
-    // Then load from network (with loading indicator)
-    await _loadCoinsNetwork(showLoading: true);
+    // Then load from network fresh (with loading indicator)
+    // Use forceFresh=true to get actual fresh data from server, not cache again
+    await _loadCoinsNetwork(showLoading: true, forceFresh: true);
   }
 
   /// Loads coins from cache (non-blocking, shows immediately)

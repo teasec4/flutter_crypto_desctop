@@ -54,8 +54,13 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     // Try to load from cache first
     await _loadPortfolioFromCache(userEmail);
 
-    // Then load from network (with loading indicator)
-    await _loadPortfolioNetwork(showLoading: true, userEmail: userEmail);
+    // Then load from network fresh (with loading indicator)
+    // Use forceFresh=true to get actual fresh data from server, not cache again
+    await _loadPortfolioNetwork(
+      showLoading: true,
+      userEmail: userEmail,
+      forceFresh: true,
+    );
   }
 
   /// Loads portfolio from cache (non-blocking, shows immediately)
