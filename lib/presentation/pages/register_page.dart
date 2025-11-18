@@ -1,3 +1,4 @@
+import 'package:crypto_desctop/core/theme/theme_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,7 +58,25 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Register')),
+        appBar: AppBar(
+          title: const Text('Register'),
+          actions: [
+            BlocBuilder<ThemeCubit, ThemeState>(
+              builder: (context, themeState) {
+                final isDark = themeState is ThemeDark;
+                return IconButton(
+                  icon: Icon(
+                    isDark ? Icons.light_mode : Icons.dark_mode,
+                  ),
+                  onPressed: () {
+                    context.read<ThemeCubit>().toggleTheme();
+                  },
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
         body: Center(
           child: Container(
             padding: const EdgeInsets.all(20),

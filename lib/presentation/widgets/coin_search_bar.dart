@@ -95,7 +95,34 @@ class _CoinSearchBarState extends State<CoinSearchBar>
       animation: _focusAnimation,
       builder: (context, child) {
         return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
+            // Gradient background
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.lerp(
+                  bgColorUnfocused,
+                  bgColorFocused,
+                  _focusAnimation.value,
+                )!,
+                Color.lerp(
+                  bgColorUnfocused,
+                  bgColorFocused.withAlpha(200),
+                  _focusAnimation.value,
+                )!,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Color.lerp(
+                borderColorUnfocused,
+                borderColorFocused,
+                _focusAnimation.value,
+              )!,
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: colorScheme.primary.withValues(
@@ -106,117 +133,92 @@ class _CoinSearchBarState extends State<CoinSearchBar>
               ),
             ],
           ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              // Gradient background
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color.lerp(
-                    bgColorUnfocused,
-                    bgColorFocused,
-                    _focusAnimation.value,
-                  )!,
-                  Color.lerp(
-                    bgColorUnfocused,
-                    bgColorFocused.withAlpha(200),
-                    _focusAnimation.value,
-                  )!,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: Color.lerp(
-                  borderColorUnfocused,
-                  borderColorFocused,
-                  _focusAnimation.value,
-                )!,
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              children: [
-                // Search icon with animation
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, _) {
-                      return Transform.scale(
-                        scale: 0.9 + (_focusAnimation.value * 0.1),
-                        child: Icon(
-                          Icons.search,
-                          color: Color.lerp(
-                            iconColorUnfocused,
-                            iconColorFocused,
-                            _focusAnimation.value,
-                          ),
-                          size: 20,
+          child: Row(
+            children: [
+              // Search icon with animation
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, _) {
+                    return Transform.scale(
+                      scale: 0.9 + (_focusAnimation.value * 0.1),
+                      child: Icon(
+                        Icons.search,
+                        color: Color.lerp(
+                          iconColorUnfocused,
+                          iconColorFocused,
+                          _focusAnimation.value,
                         ),
-                      );
-                    },
-                  ),
+                        size: 20,
+                      ),
+                    );
+                  },
                 ),
+              ),
 
-                // Text field
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    onChanged: widget.onChanged,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: InputDecoration(
+              // Text field
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  onChanged: widget.onChanged,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
                       hintText: 'Search coins by name or symbol...',
                       hintStyle: TextStyle(
                         color: hintColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                       ),
+                      filled: false,
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
                       isDense: true,
                     ),
-                    cursorColor: colorScheme.primary,
-                    cursorWidth: 2,
-                  ),
+                  cursorColor: colorScheme.primary,
+                  cursorWidth: 2,
                 ),
+              ),
 
-                // Clear button with animation
-                if (_controller.text.isNotEmpty)
-                  ScaleTransition(
-                    scale: Tween<double>(begin: 0, end: 1).animate(
-                      CurvedAnimation(
-                        parent: _animationController,
-                        curve: Curves.easeOut,
-                      ),
+              // Clear button with animation
+              if (_controller.text.isNotEmpty)
+                ScaleTransition(
+                  scale: Tween<double>(begin: 0, end: 1).animate(
+                    CurvedAnimation(
+                      parent: _animationController,
+                      curve: Curves.easeOut,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: GestureDetector(
-                        onTap: _handleClear,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: clearButtonBg.withValues(alpha: 0.6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.close_rounded,
-                            color: clearButtonIcon,
-                            size: 18,
-                          ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: GestureDetector(
+                      onTap: _handleClear,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: clearButtonBg.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: clearButtonIcon,
+                          size: 18,
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         );
       },
