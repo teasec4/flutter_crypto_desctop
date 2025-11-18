@@ -17,5 +17,7 @@ class CoinDetailLoaded extends CoinDetailState {
 /// State indicating an error occurred while loading coin details
 class CoinDetailError extends CoinDetailState {
   final String message;
-  CoinDetailError(this.message);
+  final String? coinId;
+  
+  CoinDetailError(this.message, {this.coinId});
 }

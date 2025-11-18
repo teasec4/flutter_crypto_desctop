@@ -59,6 +59,44 @@ class CoinDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: BlocBuilder<CoinDetailCubit, CoinDetailState>(
+          builder: (context, state) {
+            if (state is CoinDetailLoaded) {
+              final coin = state.coin;
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.network(
+                    coin.imageUrl,
+                    width: 24,
+                    height: 24,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.currency_bitcoin,
+                      size: 24,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    coin.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
       body: SafeArea(
         child: BlocBuilder<CoinDetailCubit, CoinDetailState>(
           builder: (context, state) {
@@ -66,17 +104,40 @@ class CoinDetailView extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (state is CoinDetailError) {
               return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red.shade400,
-                    ),
-                    const SizedBox(height: 16),
-                    Text('Error: ${state.message}'),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Unable to load coin details',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        state.message,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => context
+                            .read<CoinDetailCubit>()
+                            .loadCoin(state.coinId ?? '', chartDays: selectedChartDays),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Try Again'),
+                      ),
+                    ],
+                  ),
                 ),
               );
             } else if (state is CoinDetailLoaded) {
@@ -86,25 +147,7 @@ class CoinDetailView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Back button and header
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          Expanded(
-                            child: Text(
-                              coin.name,
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
                     // Price chart (moved to top - FIRST)
                     Padding(
@@ -131,28 +174,6 @@ class CoinDetailView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Coin image and symbol
-                          Center(
-                            child: Column(
-                              children: [
-                                Image.network(
-                                  coin.imageUrl,
-                                  width: 60,
-                                  height: 60,
-                                  errorBuilder: (_, __, ___) =>
-                                      const Icon(Icons.error, size: 60),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  coin.symbol.toUpperCase(),
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
                           // Current Price
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

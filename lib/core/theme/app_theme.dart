@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const primaryColor = Color(0xFF6366F1);
@@ -88,19 +89,21 @@ class AppTheme {
           ),
         ),
       ),
-      textTheme: TextTheme(
-        headlineLarge: const TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: primaryColor,
+      textTheme: GoogleFonts.interTextTheme(
+        TextTheme(
+          headlineLarge: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: primaryColor,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade800,
+          ),
+          bodyLarge: TextStyle(fontSize: 14, color: Colors.grey.shade800),
+          bodySmall: TextStyle(fontSize: 12, color: Colors.grey.shade600),
         ),
-        titleMedium: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.grey.shade800,
-        ),
-        bodyLarge: TextStyle(fontSize: 14, color: Colors.grey.shade800),
-        bodySmall: TextStyle(fontSize: 12, color: Colors.grey.shade600),
       ),
     );
   }
@@ -183,19 +186,21 @@ class AppTheme {
           ),
         ),
       ),
-      textTheme: TextTheme(
-        headlineLarge: const TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: primaryColor,
+      textTheme: GoogleFonts.interTextTheme(
+        TextTheme(
+          headlineLarge: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: primaryColor,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade200,
+          ),
+          bodyLarge: TextStyle(fontSize: 14, color: Colors.grey.shade300),
+          bodySmall: TextStyle(fontSize: 12, color: Colors.grey.shade500),
         ),
-        titleMedium: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.grey.shade200,
-        ),
-        bodyLarge: TextStyle(fontSize: 14, color: Colors.grey.shade300),
-        bodySmall: TextStyle(fontSize: 12, color: Colors.grey.shade500),
       ),
     );
   }

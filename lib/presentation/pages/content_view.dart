@@ -58,6 +58,10 @@ class _ContentViewState extends State<ContentView> {
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
               margin: const EdgeInsets.all(16),
+              backgroundColor: Colors.green.shade500,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           );
         }

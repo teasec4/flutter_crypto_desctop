@@ -20,6 +20,10 @@ class PortfolioPage extends StatelessWidget {
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
               margin: const EdgeInsets.all(16),
+              backgroundColor: Colors.green.shade500,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           );
         }
@@ -404,6 +408,10 @@ class _EditPortfolioSheetState extends State<_EditPortfolioSheet> {
                 SnackBar(
                   content: Text('${widget.item.symbol} amount updated'),
                   duration: const Duration(seconds: 2),
+                  backgroundColor: Colors.green.shade500,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               );
             }

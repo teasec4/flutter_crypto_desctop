@@ -30,108 +30,117 @@ class CoinTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 4,
-          ),
-          minVerticalPadding: 0,
-          dense: true,
-          leading: Row(
-            mainAxisSize: MainAxisSize.min,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.goToCoinDetail(coin.id),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
             children: [
-              // Market cap rank
-              Text(
-                UIUtils.formatRank(coin.marketCapRank),
-                style: TextStyle(
-                  fontSize: 11,
-                  color: UIUtils.getSecondaryTextColor(context),
-                  fontWeight: FontWeight.bold,
+              // Rank badge
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  UIUtils.formatRank(coin.marketCapRank),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              // Coin icon/image
+              const SizedBox(width: 12),
+              // Coin icon
               Image.network(
                 coin.imageUrl,
-                width: 20,
-                height: 20,
-                errorBuilder: (_, __, ___) => const Icon(Icons.error, size: 20),
+                width: 32,
+                height: 32,
+                errorBuilder: (_, __, ___) => Icon(
+                  Icons.currency_bitcoin,
+                  size: 32,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-            ],
-          ),
-          // Coin name
-          title: Text(
-            coin.name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          // Coin symbol
-          subtitle: Text(
-            coin.symbol.toUpperCase(),
-            style: TextStyle(
-              color: UIUtils.getSecondaryTextColor(context),
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Price and 24h change
+              const SizedBox(width: 12),
+              // Coin name and symbol
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      coin.name,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      coin.symbol.toUpperCase(),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Price and change
               Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Current price
                   Text(
                     '\$${coin.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
-                  // 24 hour price change percentage
-                  Text(
-                    '${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
-                    style: TextStyle(
-                      color: coin.priceChangePercentage24H >= 0
-                          ? Colors.green.shade500
-                          : Colors.red.shade400,
-                      fontSize: 11,
+                  const SizedBox(height: 2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: (coin.priceChangePercentage24H >= 0
+                              ? Colors.green.shade500
+                              : Colors.red.shade400)
+                          .withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '${coin.priceChangePercentage24H >= 0 ? '+' : ''}${coin.priceChangePercentage24H.toStringAsFixed(2)}%',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: coin.priceChangePercentage24H >= 0
+                            ? Colors.green.shade500
+                            : Colors.red.shade400,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               // Add to portfolio button
               SizedBox(
                 width: 36,
                 height: 36,
                 child: IconButton(
-                  iconSize: 18,
+                  iconSize: 20,
                   padding: EdgeInsets.zero,
                   icon: const Icon(Icons.add_sharp),
                   onPressed: () => _showAddToPortfolioModal(context),
+                  tooltip: 'Add to portfolio',
                 ),
               ),
             ],
           ),
-          // Navigate to coin detail page on tap
-          onTap: () => context.goToCoinDetail(coin.id),
         ),
-        // Divider
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Divider(
-            height: 1,
-            thickness: 0.5,
-            color: UIUtils.getSecondaryTextColor(
-              context,
-            ).withValues(alpha: 0.1),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

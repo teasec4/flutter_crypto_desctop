@@ -149,6 +149,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  String _getPageTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'Market';
+      case 1:
+        return 'Portfolio';
+      case 2:
+        return 'Settings';
+      default:
+        return '';
+    }
+  }
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -171,6 +184,14 @@ class _HomePageState extends State<HomePage> {
                 icon: const Icon(Icons.menu),
                 onPressed: () => _scaffoldKey.currentState?.openDrawer(),
               ),
+              title: Text(
+                _getPageTitle(selectedIndex),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+              ),
+              centerTitle: false,
             )
           : null,
       body: Row(

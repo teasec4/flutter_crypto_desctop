@@ -26,7 +26,7 @@ class CoinDetailCubit extends Cubit<CoinDetailState> {
 
       emit(CoinDetailLoaded(coin, chartData: chartData as dynamic));
     } catch (e) {
-      emit(CoinDetailError(e.toString()));
+      emit(CoinDetailError(e.toString(), coinId: coinId));
     }
   }
 }
