@@ -5,41 +5,41 @@
 
 # Crypto Desktop
 
-Кроссплатформенное приложение для мониторинга и анализа криптовалютных данных.
+A cross-platform application for monitoring and analyzing cryptocurrency data.
 
-## Возможности
+## Features
 
-- 📊 Просмотр графиков и аналитики цен криптовалют
-- 💾 Локальное сохранение данных с Isar
-- 🔐 Аутентификация через Supabase
-- 📱 Поддержка Windows, macOS, Linux и Web
+- 📊 View charts and cryptocurrency price analytics
+- 💾 Local data storage with Isar
+- 🔐 Authentication via Supabase
+- 📱 Support for Windows, macOS, Linux, and Web
 
-## Технологический стек
+## Tech Stack
 
-- **Flutter** — фреймворк для UI
-- **BLoC** — управление состоянием
-- **Isar** — локальная база данных
-- **Supabase** — аутентификация и backend
-- **Go Router** — навигация
-- **FL Chart** — графики и визуализация
+- **Flutter** — UI framework
+- **BLoC** — state management
+- **Isar** — local database
+- **Supabase** — authentication and backend
+- **Go Router** — navigation
+- **FL Chart** — charts and visualization
 
-## Принципы разработки
+## Development Principles
 
 - Clean Architecture
-- BLoC Pattern для управления состоянием
-- Разделение слоев: presentation, domain, data
+- BLoC Pattern for state management
+- Layer separation: presentation, domain, data
 
-## Начало работы
+## Getting Started
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-## Лицензия
+## License
 
-MIT License - см. LICENSE файл
+MIT License - see LICENSE file
 
 ---
 
-**Автор:** [teasec4](https://github.com/teasec4)
+**Author:** [teasec4](https://github.com/teasec4)
