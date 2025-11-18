@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Widget that displays search results for coins
+/// Adapts colors to both light and dark themes
 class CoinSearchResults extends StatelessWidget {
   final ScrollController scrollController;
 
@@ -11,6 +12,19 @@ class CoinSearchResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+
+    // Define colors based on theme
+    final emptyIconBg = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
+    final emptyIconColor = colorScheme.primary.withValues(alpha: 0.6);
+    final emptyTitleColor = colorScheme.onSurface;
+    final emptyQueryColor = colorScheme.onSurface.withValues(alpha: 0.6);
+    final emptyHintColor = colorScheme.onSurface.withValues(alpha: 0.5);
+    final resultTitleColor = colorScheme.onSurface.withValues(alpha: 0.7);
+    final queryHighlightColor = colorScheme.primary;
+
     return BlocBuilder<CoinSearchCubit, CoinSearchState>(
       builder: (context, state) {
         if (state is CoinSearchInitial) {
@@ -25,20 +39,20 @@ class CoinSearchResults extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade800.withValues(alpha: 0.5),
+                    color: emptyIconBg,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.search_off_rounded,
                     size: 56,
-                    color: Colors.blue.shade300.withValues(alpha: 0.6),
+                    color: emptyIconColor,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   'No coins found',
                   style: TextStyle(
-                    color: Colors.grey.shade300,
+                    color: emptyTitleColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -46,12 +60,12 @@ class CoinSearchResults extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'for "${state.query}"',
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                  style: TextStyle(color: emptyQueryColor, fontSize: 14),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Try searching by coin name or symbol',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  style: TextStyle(color: emptyHintColor, fontSize: 12),
                 ),
               ],
             ),
@@ -78,7 +92,7 @@ class CoinSearchResults extends StatelessWidget {
                     Text(
                       'Results for',
                       style: TextStyle(
-                        color: Colors.grey.shade400,
+                        color: resultTitleColor,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -86,8 +100,8 @@ class CoinSearchResults extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       '"$query"',
-                      style: const TextStyle(
-                        color: Colors.blue,
+                      style: TextStyle(
+                        color: queryHighlightColor,
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
@@ -100,14 +114,17 @@ class CoinSearchResults extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.blue.shade700, Colors.blue.shade600],
+                          colors: [
+                            colorScheme.primary,
+                            colorScheme.primary.withValues(alpha: 0.8),
+                          ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         '${results.length} coin${results.length != 1 ? 's' : ''}',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),

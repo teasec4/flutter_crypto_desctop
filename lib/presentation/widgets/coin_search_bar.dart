@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Beautiful animated search bar for coins with modern design
+/// Adapts to both light and dark themes automatically
 class CoinSearchBar extends StatefulWidget {
   final Future<void> Function(String) onChanged;
   final VoidCallback onClear;
@@ -64,6 +65,32 @@ class _CoinSearchBarState extends State<CoinSearchBar>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+
+    // Define colors based on theme
+    final bgColorUnfocused = isDark
+        ? Colors.grey.shade800
+        : Colors.grey.shade100;
+    final bgColorFocused = isDark ? Colors.blue.shade900 : Colors.blue.shade50;
+    final borderColorUnfocused = isDark
+        ? Colors.grey.shade700
+        : Colors.grey.shade300;
+    final borderColorFocused = isDark
+        ? Colors.blue.shade400
+        : Colors.blue.shade600;
+    final iconColorUnfocused = isDark
+        ? Colors.grey.shade500
+        : Colors.grey.shade600;
+    final iconColorFocused = colorScheme.primary;
+    final textColor = colorScheme.onSurface;
+    final hintColor = isDark ? Colors.grey.shade500 : Colors.grey.shade600;
+    final clearButtonBg = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
+    final clearButtonIcon = isDark
+        ? Colors.grey.shade400
+        : Colors.grey.shade600;
+
     return AnimatedBuilder(
       animation: _focusAnimation,
       builder: (context, child) {
@@ -71,11 +98,11 @@ class _CoinSearchBarState extends State<CoinSearchBar>
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.blue.withValues(
-                  alpha: 0.1 + (_focusAnimation.value * 0.2),
+                color: colorScheme.primary.withValues(
+                  alpha: 0.05 + (_focusAnimation.value * 0.15),
                 ),
-                blurRadius: 12 + (_focusAnimation.value * 8),
-                offset: const Offset(0, 4),
+                blurRadius: 8 + (_focusAnimation.value * 6),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -88,13 +115,13 @@ class _CoinSearchBarState extends State<CoinSearchBar>
                 end: Alignment.bottomRight,
                 colors: [
                   Color.lerp(
-                    Colors.grey.shade800,
-                    Colors.blue.shade900.withValues(alpha: 0.15),
+                    bgColorUnfocused,
+                    bgColorFocused,
                     _focusAnimation.value,
                   )!,
                   Color.lerp(
-                    Colors.grey.shade900,
-                    Colors.blue.shade800.withValues(alpha: 0.1),
+                    bgColorUnfocused,
+                    bgColorFocused.withAlpha(200),
                     _focusAnimation.value,
                   )!,
                 ],
@@ -102,8 +129,8 @@ class _CoinSearchBarState extends State<CoinSearchBar>
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: Color.lerp(
-                  Colors.grey.shade700,
-                  Colors.blue.shade400,
+                  borderColorUnfocused,
+                  borderColorFocused,
                   _focusAnimation.value,
                 )!,
                 width: 1.5,
@@ -122,8 +149,8 @@ class _CoinSearchBarState extends State<CoinSearchBar>
                         child: Icon(
                           Icons.search,
                           color: Color.lerp(
-                            Colors.grey.shade500,
-                            Colors.blue.shade400,
+                            iconColorUnfocused,
+                            iconColorFocused,
                             _focusAnimation.value,
                           ),
                           size: 20,
@@ -139,15 +166,15 @@ class _CoinSearchBarState extends State<CoinSearchBar>
                     controller: _controller,
                     focusNode: _focusNode,
                     onChanged: widget.onChanged,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: textColor,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Search coins by name or symbol...',
                       hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
+                        color: hintColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                       ),
@@ -155,7 +182,7 @@ class _CoinSearchBarState extends State<CoinSearchBar>
                       contentPadding: EdgeInsets.zero,
                       isDense: true,
                     ),
-                    cursorColor: Colors.blue.shade400,
+                    cursorColor: colorScheme.primary,
                     cursorWidth: 2,
                   ),
                 ),
@@ -176,12 +203,12 @@ class _CoinSearchBarState extends State<CoinSearchBar>
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade800.withValues(alpha: 0.8),
+                            color: clearButtonBg.withValues(alpha: 0.6),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.close_rounded,
-                            color: Colors.grey.shade400,
+                            color: clearButtonIcon,
                             size: 18,
                           ),
                         ),
