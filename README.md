@@ -7,6 +7,16 @@
 
 A cross-platform application for monitoring and analyzing cryptocurrency data.
 
+## Screenshots
+
+| Market | Search |
+|--------|--------|
+| ![Market](./screenshots/market.png) | ![Search](./screenshots/search.png) |
+| **Portfolio** | **Changes** |
+| ![Portfolio](./screenshots/portfolio.png) | ![Changes](./screenshots/changes.png) |
+| **Settings** | **Drawer** |
+| ![Settings](./screenshots/settings.png) | ![Drawer](./screenshots/drawer.png) |
+
 ## Features
 
 - 📊 View charts and cryptocurrency price analytics
