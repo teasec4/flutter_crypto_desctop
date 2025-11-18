@@ -37,6 +37,13 @@ class CoinError extends CoinState {
   CoinError(this.message, {this.previousCoins = const []});
 }
 
+/// State emitted when coins are updated from network (silent background refresh)
+class CoinUpdated extends CoinState {
+  final List<Coin> coins;
+
+  CoinUpdated(this.coins);
+}
+
 /// Cubit for managing the cryptocurrency coins list with pagination
 /// Only loads coins when user is authenticated for security
 class CoinCubit extends Cubit<CoinState> {
@@ -160,13 +167,19 @@ class CoinCubit extends Cubit<CoinState> {
         );
       }
 
-      emit(
-        CoinLoaded(
-          coins: coinsList,
-          currentPage: 1,
-          hasMorePages: coinsList.length == coinsPerPage,
-        ),
+      final newState = CoinLoaded(
+        coins: coinsList,
+        currentPage: 1,
+        hasMorePages: coinsList.length == coinsPerPage,
       );
+      
+      emit(newState);
+      
+      // Emit CoinUpdated for manual refreshes to show toast
+      if (showLoading) {
+        emit(CoinUpdated(coinsList));
+        emit(newState); // Return to normal state after notification
+      }
     } catch (e) {
       developer.log('CoinCubit: Network load failed - $e');
       final previousCoins = (state is CoinLoading)

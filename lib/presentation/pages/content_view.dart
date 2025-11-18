@@ -48,12 +48,26 @@ class _ContentViewState extends State<ContentView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CoinCubit, CoinState>(
-      builder: (context, state) {
-        // Show loading spinner during initial load
-        if (state is CoinInitial) {
-          return const Center(child: CircularProgressIndicator());
+    return BlocListener<CoinCubit, CoinState>(
+      listener: (context, state) {
+        // Show toast when coins are updated in background
+        if (state is CoinUpdated) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Coin prices updated'),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+            ),
+          );
         }
+      },
+      child: BlocBuilder<CoinCubit, CoinState>(
+        builder: (context, state) {
+          // Show loading spinner during initial load
+          if (state is CoinInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
         // Show error message if initial load fails
         if (state is CoinError && state.previousCoins.isEmpty) {
@@ -122,8 +136,9 @@ class _ContentViewState extends State<ContentView> {
           );
         }
 
-        return const SizedBox.shrink();
-      },
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 }

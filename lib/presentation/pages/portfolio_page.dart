@@ -10,11 +10,25 @@ class PortfolioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PortfolioCubit, PortfolioState>(
-      builder: (context, state) {
-        if (state is PortfolioLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is PortfolioLoaded) {
+    return BlocListener<PortfolioCubit, PortfolioState>(
+      listener: (context, state) {
+        // Show toast when portfolio is updated in background
+        if (state is PortfolioUpdated) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Portfolio updated'),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<PortfolioCubit, PortfolioState>(
+        builder: (context, state) {
+          if (state is PortfolioLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is PortfolioLoaded) {
           // Handle empty portfolio safely
           if (state.items.isEmpty) {
             return _buildEmptyPortfolio(context);
@@ -149,9 +163,10 @@ class PortfolioPage extends StatelessWidget {
               ],
             ),
           );
-        }
-        return const SizedBox();
-      },
+          }
+          return const SizedBox();
+        },
+      ),
     );
   }
 

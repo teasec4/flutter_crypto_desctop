@@ -123,7 +123,15 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       developer.log(
         'PortfolioCubit: Loaded ${enrichedItems.length} items from network',
       );
-      emit(PortfolioLoaded(enrichedItems));
+      
+      final newState = PortfolioLoaded(enrichedItems);
+      emit(newState);
+      
+      // Emit PortfolioUpdated for manual refreshes to show toast
+      if (showLoading) {
+        emit(PortfolioUpdated(enrichedItems));
+        emit(newState); // Return to normal state after notification
+      }
     } catch (e) {
       developer.log('PortfolioCubit: Network load failed - $e');
       final previousItems = (state is PortfolioLoaded)

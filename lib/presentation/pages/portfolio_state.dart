@@ -23,3 +23,10 @@ final class PortfolioError extends PortfolioState {
 
   PortfolioError(this.message);
 }
+
+/// State emitted when portfolio is updated from network (silent background refresh)
+final class PortfolioUpdated extends PortfolioState {
+  final List<PortfolioItem> items;
+
+  PortfolioUpdated(this.items);
+}
