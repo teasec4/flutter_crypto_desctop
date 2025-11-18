@@ -141,6 +141,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onSelectIndex(int index, BuildContext context) {
+    // Clear search when navigating away from home tab
+    if (index != 0) {
+      context.read<CoinSearchCubit>().clearSearch();
+    }
+
     switch (index) {
       case 0:
         context.go(AppConstants.homeRoute);
@@ -182,74 +187,72 @@ class _HomePageState extends State<HomePage> {
       key: _scaffoldKey,
       drawer: isNarrow ? _buildDrawer(context, selectedIndex) : null,
       appBar: isNarrow
-           ? AppBar(
-               elevation: 0,
-               backgroundColor: Colors.transparent,
-               leading: IconButton(
-                 icon: const Icon(Icons.menu),
-                 onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-               ),
-               title: Text(
-                 _getPageTitle(selectedIndex),
-                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                   fontWeight: FontWeight.w500,
-                   color: Theme.of(
-                     context,
-                   ).colorScheme.onSurface.withValues(alpha: 0.6),
-                 ),
-               ),
-               centerTitle: false,
-               actions: [
-                 // Theme toggle
-                 BlocBuilder<ThemeCubit, ThemeState>(
-                   builder: (context, themeState) {
-                     final isDark = themeState is ThemeDark;
-                     return IconButton(
-                       icon: Icon(
-                         isDark ? Icons.light_mode : Icons.dark_mode,
-                       ),
-                       onPressed: () {
-                         context.read<ThemeCubit>().toggleTheme();
-                       },
-                     );
-                   },
-                 ),
-                 // Auth buttons
-                 BlocBuilder<AuthCubit, AuthState>(
-                   builder: (context, authState) {
-                     if (authState is AuthAuthenticated) {
-                       return IconButton(
-                         icon: const Icon(Icons.person),
-                         onPressed: () {
-                           context.go(AppConstants.settingsRoute);
-                         },
-                       );
-                     } else {
-                       return Row(
-                         mainAxisSize: MainAxisSize.min,
-                         children: [
-                           TextButton(
-                             onPressed: () {
-                               context.go(AppConstants.loginRoute);
-                             },
-                             child: const Text('Login'),
-                           ),
-                           const SizedBox(width: 8),
-                           TextButton(
-                             onPressed: () {
-                               context.go(AppConstants.registerRoute);
-                             },
-                             child: const Text('Register'),
-                           ),
-                           const SizedBox(width: 8),
-                         ],
-                       );
-                     }
-                   },
-                 ),
-               ],
-             )
-           : null,
+          ? AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              leading: IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              ),
+              title: Text(
+                _getPageTitle(selectedIndex),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+              centerTitle: false,
+              actions: [
+                // Theme toggle
+                BlocBuilder<ThemeCubit, ThemeState>(
+                  builder: (context, themeState) {
+                    final isDark = themeState is ThemeDark;
+                    return IconButton(
+                      icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+                      onPressed: () {
+                        context.read<ThemeCubit>().toggleTheme();
+                      },
+                    );
+                  },
+                ),
+                // Auth buttons
+                BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, authState) {
+                    if (authState is AuthAuthenticated) {
+                      return IconButton(
+                        icon: const Icon(Icons.person),
+                        onPressed: () {
+                          context.go(AppConstants.settingsRoute);
+                        },
+                      );
+                    } else {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              context.go(AppConstants.loginRoute);
+                            },
+                            child: const Text('Login'),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () {
+                              context.go(AppConstants.registerRoute);
+                            },
+                            child: const Text('Register'),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                      );
+                    }
+                  },
+                ),
+              ],
+            )
+          : null,
       body: Row(
         children: [
           // Wide layout
@@ -298,7 +301,9 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     'Your crypto portfolio',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -329,6 +334,7 @@ class _HomePageState extends State<HomePage> {
                     selectedIcon: Icons.pie_chart,
                     isSelected: selectedIndex == 1,
                     onTap: () {
+                      context.read<CoinSearchCubit>().clearSearch();
                       context.go(AppConstants.portfolioRoute);
                       Navigator.of(context).pop();
                     },
@@ -341,6 +347,7 @@ class _HomePageState extends State<HomePage> {
                     selectedIcon: Icons.settings,
                     isSelected: selectedIndex == 2,
                     onTap: () {
+                      context.read<CoinSearchCubit>().clearSearch();
                       context.go(AppConstants.settingsRoute);
                       Navigator.of(context).pop();
                     },
@@ -470,7 +477,7 @@ class _HomePageState extends State<HomePage> {
     required VoidCallback onTap,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -511,11 +518,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               if (isSelected)
-                Icon(
-                  Icons.check_circle,
-                  size: 20,
-                  color: colorScheme.primary,
-                ),
+                Icon(Icons.check_circle, size: 20, color: colorScheme.primary),
             ],
           ),
         ),
