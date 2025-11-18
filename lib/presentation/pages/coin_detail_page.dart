@@ -87,8 +87,8 @@ class CoinDetailView extends StatelessWidget {
                   Text(
                     coin.name,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               );
@@ -117,9 +117,8 @@ class CoinDetailView extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         'Unable to load coin details',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -130,9 +129,11 @@ class CoinDetailView extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
-                        onPressed: () => context
-                            .read<CoinDetailCubit>()
-                            .loadCoin(state.coinId ?? '', chartDays: selectedChartDays),
+                        onPressed: () =>
+                            context.read<CoinDetailCubit>().loadCoin(
+                              state.coinId ?? '',
+                              chartDays: selectedChartDays,
+                            ),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Try Again'),
                       ),
@@ -175,7 +176,8 @@ class CoinDetailView extends StatelessWidget {
                           children: [
                             Text(
                               '24h Change',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
@@ -200,7 +202,8 @@ class CoinDetailView extends StatelessWidget {
                           children: [
                             Text(
                               '24h Change (\$)',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface

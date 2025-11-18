@@ -12,9 +12,7 @@ import 'package:crypto_desctop/domain/repository/auth_repo.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
 
-  AuthRepositoryImpl({
-    required this.remoteDataSource,
-  });
+  AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<User> register(
@@ -22,11 +20,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String password,
     String displayName,
   ) async {
-    return await remoteDataSource.register(
-      email,
-      password,
-      displayName,
-    );
+    return await remoteDataSource.register(email, password, displayName);
   }
 
   @override

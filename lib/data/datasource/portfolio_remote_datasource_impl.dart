@@ -54,11 +54,11 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       );
 
       // First, check if this symbol already exists for this user
-       final existingItem = await _supabase
-           .from(AppConstants.portfolioTable)
-           .select('${AppConstants.id}, ${AppConstants.amount}')
-           .eq(AppConstants.symbol, item.symbol)
-           .eq(AppConstants.userId, userId)
+      final existingItem = await _supabase
+          .from(AppConstants.portfolioTable)
+          .select('${AppConstants.id}, ${AppConstants.amount}')
+          .eq(AppConstants.symbol, item.symbol)
+          .eq(AppConstants.userId, userId)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () {
@@ -199,5 +199,4 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       throw Exception('Failed to remove portfolio item: ${e.toString()}');
     }
   }
-
 }

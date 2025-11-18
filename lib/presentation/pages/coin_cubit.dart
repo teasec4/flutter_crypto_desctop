@@ -48,6 +48,7 @@ class CoinUpdated extends CoinState {
 /// Only loads coins when user is authenticated for security
 class CoinCubit extends Cubit<CoinState> {
   final CoinRepo coinRepo;
+  // API max per page is 100
   static const int coinsPerPage = 100;
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
@@ -172,9 +173,9 @@ class CoinCubit extends Cubit<CoinState> {
         currentPage: 1,
         hasMorePages: coinsList.length == coinsPerPage,
       );
-      
+
       emit(newState);
-      
+
       // Emit CoinUpdated for manual refreshes to show toast
       if (showLoading) {
         emit(CoinUpdated(coinsList));

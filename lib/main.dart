@@ -8,6 +8,7 @@ import 'package:crypto_desctop/di/service_locator.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
+import 'package:crypto_desctop/presentation/pages/coin_search_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
 import 'package:crypto_desctop/router/app_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
@@ -30,7 +31,7 @@ void main() async {
     // init Supabase
     await Supabase.initialize(
       url: dotenv.env['SUPABASE_URL'] ?? '',
-      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? ''
+      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
     );
 
     // init Isar
@@ -72,6 +73,10 @@ class MyApp extends StatelessWidget {
             // Security: Only load coins after user is verified as authorized
             return CoinCubit(getIt<CoinRepo>());
           },
+        ),
+        BlocProvider(
+          create: (context) =>
+              CoinSearchCubit(allCoins: [], coinRepo: getIt<CoinRepo>()),
         ),
         BlocProvider(
           create: (context) =>
@@ -187,9 +192,11 @@ class _HomePageState extends State<HomePage> {
               title: Text(
                 _getPageTitle(selectedIndex),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
               ),
               centerTitle: false,
             )

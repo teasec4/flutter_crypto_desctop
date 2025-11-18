@@ -22,9 +22,12 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
 
       final response = await http
           .get(url)
-          .timeout(_timeout, onTimeout: () => throw TimeoutException(
-                'Request timeout after ${_timeout.inSeconds}s',
-              ));
+          .timeout(
+            _timeout,
+            onTimeout: () => throw TimeoutException(
+              'Request timeout after ${_timeout.inSeconds}s',
+            ),
+          );
 
       if (response.statusCode == 200) {
         final rawList = json.decode(response.body) as List;
@@ -49,9 +52,12 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
 
       final response = await http
           .get(url)
-          .timeout(_timeout, onTimeout: () => throw TimeoutException(
-                'Request timeout after ${_timeout.inSeconds}s',
-              ));
+          .timeout(
+            _timeout,
+            onTimeout: () => throw TimeoutException(
+              'Request timeout after ${_timeout.inSeconds}s',
+            ),
+          );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
@@ -71,7 +77,9 @@ class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
           if (point.price > maxPrice) maxPrice = point.price;
         }
 
-        final currentPrice = dataPoints.isNotEmpty ? dataPoints.last.price : 0.0;
+        final currentPrice = dataPoints.isNotEmpty
+            ? dataPoints.last.price
+            : 0.0;
 
         return CoinChartData(
           coinId: coinId,

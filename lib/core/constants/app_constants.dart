@@ -16,7 +16,7 @@ class AppConstants {
   // Supabase tables and columns
   static const String portfolioTable = 'portfolio';
   static const String profilesTable = 'profiles';
-  
+
   // Supabase column names
   static const String userId = 'user_id';
   static const String id = 'id';

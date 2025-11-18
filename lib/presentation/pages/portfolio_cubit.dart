@@ -123,10 +123,10 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       developer.log(
         'PortfolioCubit: Loaded ${enrichedItems.length} items from network',
       );
-      
+
       final newState = PortfolioLoaded(enrichedItems);
       emit(newState);
-      
+
       // Emit PortfolioUpdated for manual refreshes to show toast
       if (showLoading) {
         emit(PortfolioUpdated(enrichedItems));
@@ -283,5 +283,4 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     emit(PortfolioInitial());
     developer.log('PortfolioCubit: Cleared');
   }
-  
 }

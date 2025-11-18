@@ -33,43 +33,46 @@ class PortfolioPage extends StatelessWidget {
           if (state is PortfolioLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is PortfolioLoaded) {
-          // Handle empty portfolio safely
-          if (state.items.isEmpty) {
-            return _buildEmptyPortfolio(context);
-          }
-
-          // Calculate total portfolio value
-          double totalValue = 0;
-          for (var item in state.items) {
-            // Validate item data
-            if (item.totalValue.isNaN || item.totalValue.isInfinite) {
-              continue;
+            // Handle empty portfolio safely
+            if (state.items.isEmpty) {
+              return _buildEmptyPortfolio(context);
             }
-            totalValue += item.totalValue;
-          }
 
-          // Validate total value
-          if (totalValue.isNaN || totalValue.isInfinite) {
-            totalValue = 0;
-          }
+            // Calculate total portfolio value
+            double totalValue = 0;
+            for (var item in state.items) {
+              // Validate item data
+              if (item.totalValue.isNaN || item.totalValue.isInfinite) {
+                continue;
+              }
+              totalValue += item.totalValue;
+            }
 
-          return RefreshIndicator(
-            onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
-            child: Column(
-              children: [
-                // Total portfolio value - Apple style card
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width > 350
-                      ? 350
-                      : double.infinity,
-                    child: Container(
+            // Validate total value
+            if (totalValue.isNaN || totalValue.isInfinite) {
+              totalValue = 0;
+            }
+
+            return RefreshIndicator(
+              onRefresh: () =>
+                  context.read<PortfolioCubit>().refreshPortfolio(),
+              child: Column(
+                children: [
+                  // Total portfolio value - Apple style card
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width > 350
+                          ? 350
+                          : double.infinity,
+                      child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
                               Theme.of(context).colorScheme.primary,
-                              Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.8),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -77,7 +80,9 @@ class PortfolioPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -89,19 +94,26 @@ class PortfolioPage extends StatelessWidget {
                           children: [
                             Text(
                               'Portfolio Balance',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                              ),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary
+                                        .withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               '\$${totalValue.toStringAsFixed(2)}',
-                              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
+                              style: Theme.of(context).textTheme.displayMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
+                                  ),
                             ),
                             const SizedBox(height: 16),
                             Container(
@@ -110,16 +122,21 @@ class PortfolioPage extends StatelessWidget {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.15),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 '${state.items.length} assets',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onPrimary,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
                               ),
                             ),
                           ],
@@ -127,46 +144,46 @@ class PortfolioPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                // Portfolio items list - Apple style minimal
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    itemCount: state.items.length,
-                    itemBuilder: (context, index) {
-                      // Safely access items with bounds checking
-                      if (index >= state.items.length) {
+                  // Portfolio items list - Apple style minimal
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: state.items.length,
+                      itemBuilder: (context, index) {
+                        // Safely access items with bounds checking
+                        if (index >= state.items.length) {
+                          return const SizedBox();
+                        }
+                        final item = state.items[index];
+                        // Validate item before building
+                        if (_isValidPortfolioItem(item)) {
+                          return _buildPortfolioTile(context, item, totalValue);
+                        }
                         return const SizedBox();
-                      }
-                      final item = state.items[index];
-                      // Validate item before building
-                      if (_isValidPortfolioItem(item)) {
-                        return _buildPortfolioTile(context, item, totalValue);
-                      }
-                      return const SizedBox();
-                    },
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        } else if (state is PortfolioError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Error: ${state.message}'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () =>
-                      context.read<PortfolioCubit>().refreshPortfolio(),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
+                ],
+              ),
+            );
+          } else if (state is PortfolioError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: ${state.message}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () =>
+                        context.read<PortfolioCubit>().refreshPortfolio(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
           }
           return const SizedBox();
         },
@@ -194,9 +211,13 @@ class PortfolioPage extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.surface.withValues(alpha: 0.5),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.08),
               ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -208,7 +229,9 @@ class PortfolioPage extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.08),
                   ),
                   child: item.imageUrl != null
                       ? Image.network(
@@ -262,7 +285,9 @@ class PortfolioPage extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(

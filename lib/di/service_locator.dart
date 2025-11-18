@@ -49,9 +49,7 @@ void setupServiceLocator(Isar isar) {
 
   // reg AuthRepository
   getIt.registerSingleton<AuthRepository>(
-    AuthRepositoryImpl(
-      remoteDataSource: getIt<AuthRemoteDataSource>(),
-    ),
+    AuthRepositoryImpl(remoteDataSource: getIt<AuthRemoteDataSource>()),
   );
 
   // ======== PORTFOLIO ========

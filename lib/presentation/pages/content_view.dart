@@ -1,5 +1,9 @@
+import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:crypto_desctop/presentation/coin/coin_tile.dart';
 import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
+import 'package:crypto_desctop/presentation/pages/coin_search_cubit.dart';
+import 'package:crypto_desctop/presentation/widgets/coin_search_bar.dart';
+import 'package:crypto_desctop/presentation/widgets/coin_search_results.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,6 +56,9 @@ class _ContentViewState extends State<ContentView> {
       listener: (context, state) {
         // Show toast when coins are updated in background
         if (state is CoinUpdated) {
+          // Update search cubit with new coins
+          context.read<CoinSearchCubit>().updateCoins(state.coins);
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Coin prices updated'),
@@ -67,80 +74,100 @@ class _ContentViewState extends State<ContentView> {
         }
       },
       child: BlocBuilder<CoinCubit, CoinState>(
-        builder: (context, state) {
+        builder: (context, coinState) {
           // Show loading spinner during initial load
-          if (state is CoinInitial) {
+          if (coinState is CoinInitial) {
             return const Center(child: CircularProgressIndicator());
           }
 
-        // Show error message if initial load fails
-        if (state is CoinError && state.previousCoins.isEmpty) {
-          return Center(child: Text('Error: ${state.message}'));
-        }
-
-        // Handle CoinLoading state
-        if (state is CoinLoading) {
-          final coins = state.coins;
-
-          // Initial loading (no coins yet)
-          if (coins.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+          // Show error message if initial load fails
+          if (coinState is CoinError && coinState.previousCoins.isEmpty) {
+            return Center(child: Text('Error: ${coinState.message}'));
           }
 
-          // Refreshing or loading more - show coins with loading indicator at bottom
-          return RefreshIndicator(
-            onRefresh: () async {
-              await context.read<CoinCubit>().refreshCoins();
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: coins.length + 1,
-              itemBuilder: (context, index) {
-                // Show loading indicator at the bottom
-                if (index == coins.length) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                  );
-                }
+          // Get coins from current state
+          List<Coin> coins = [];
+          if (coinState is CoinLoading) {
+            coins = coinState.coins;
+          } else if (coinState is CoinLoaded) {
+            coins = coinState.coins;
+          }
 
-                final coin = coins[index];
-                return CoinTile(coin: coin);
-              },
-            ),
-          );
-        }
+          // Initialize search cubit with all coins on first load
+          if (coins.isNotEmpty) {
+            context.read<CoinSearchCubit>().allCoins.clear();
+            context.read<CoinSearchCubit>().allCoins.addAll(coins);
+          }
 
-        // Handle CoinLoaded state
-        if (state is CoinLoaded) {
-          final coins = state.coins;
+          if (coins.isEmpty && coinState is CoinLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
           if (coins.isEmpty) {
             return const Center(child: Text('No coins found'));
           }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              await context.read<CoinCubit>().refreshCoins();
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: coins.length,
-              itemBuilder: (context, index) {
-                final coin = coins[index];
-                return CoinTile(coin: coin);
-              },
-            ),
-          );
-        }
+          return Column(
+            children: [
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: CoinSearchBar(
+                  onChanged: (query) async {
+                    await context.read<CoinSearchCubit>().search(query);
+                  },
+                  onClear: () {
+                    context.read<CoinSearchCubit>().clearSearch();
+                  },
+                ),
+              ),
+              // Main content - either search results or full list
+              Expanded(
+                child: BlocBuilder<CoinSearchCubit, CoinSearchState>(
+                  builder: (context, searchState) {
+                    // If searching, show search results
+                    if (searchState is! CoinSearchInitial) {
+                      return CoinSearchResults(
+                        scrollController: _scrollController,
+                      );
+                    }
 
-          return const SizedBox.shrink();
+                    // Otherwise show full list with refresh
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await context.read<CoinCubit>().refreshCoins();
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount:
+                            coins.length + (coinState is CoinLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          // Show loading indicator at the bottom
+                          if (index == coins.length) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          final coin = coins[index];
+                          return CoinTile(coin: coin);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
         },
       ),
     );

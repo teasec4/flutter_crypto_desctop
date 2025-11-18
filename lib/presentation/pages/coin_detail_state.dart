@@ -18,6 +18,6 @@ class CoinDetailLoaded extends CoinDetailState {
 class CoinDetailError extends CoinDetailState {
   final String message;
   final String? coinId;
-  
+
   CoinDetailError(this.message, {this.coinId});
 }
