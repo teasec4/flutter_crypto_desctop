@@ -420,7 +420,13 @@ class _EditPortfolioSheetState extends State<_EditPortfolioSheet> {
             setState(() => _isLoading = false);
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error: ${error.toString()}')),
+                SnackBar(
+                  content: Text('Error: ${error.toString()}'),
+                  backgroundColor: Colors.red.shade500,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               );
             }
           });
@@ -458,6 +464,10 @@ class _EditPortfolioSheetState extends State<_EditPortfolioSheet> {
                             '${widget.item.symbol} removed from portfolio',
                           ),
                           duration: const Duration(seconds: 2),
+                          backgroundColor: Colors.green.shade500,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       );
                     }
@@ -466,7 +476,13 @@ class _EditPortfolioSheetState extends State<_EditPortfolioSheet> {
                     setState(() => _isLoading = false);
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${error.toString()}')),
+                        SnackBar(
+                          content: Text('Error: ${error.toString()}'),
+                          backgroundColor: Colors.red.shade500,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       );
                     }
                   });

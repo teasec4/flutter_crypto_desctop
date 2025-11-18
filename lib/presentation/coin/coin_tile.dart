@@ -193,7 +193,13 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
           setState(() => _isLoading = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('User not authenticated')),
+              SnackBar(
+                content: const Text('User not authenticated'),
+                backgroundColor: Colors.red.shade500,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             );
           }
           return;
@@ -212,6 +218,10 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
                       '${widget.coin.symbol.toUpperCase()} added to portfolio',
                     ),
                     duration: const Duration(seconds: 2),
+                    backgroundColor: Colors.green.shade500,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 );
               }
@@ -221,16 +231,28 @@ class _AddToPortfolioSheetState extends State<_AddToPortfolioSheet> {
               if (mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: ${error.toString()}')),
+                  SnackBar(
+                    content: Text('Error: ${error.toString()}'),
+                    backgroundColor: Colors.red.shade500,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 );
               }
             });
       } catch (e) {
         setState(() => _isLoading = false);
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red.shade500,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
         }
       }
     }
