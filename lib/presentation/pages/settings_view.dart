@@ -25,11 +25,11 @@ class SettingsView extends StatelessWidget {
             padding: const EdgeInsets.only(top: 16, left: 16, bottom: 8),
             child: _buildSectionTitle(context, 'Notifications'),
           ),
-          ListTile(
-            leading: const Icon(Icons.notifications_outlined),
-            title: const Text('Enable notifications'),
-            subtitle: const Text('Get alerts about price changes'),
-            trailing: Switch(value: true, onChanged: (value) {}),
+          const ListTile(
+            leading: Icon(Icons.notifications_outlined),
+            title: Text('Enable notifications'),
+            subtitle: Text('Get alerts about price changes (coming soon)'),
+            trailing: Icon(Icons.lock),
           ),
 
           // Appearance Section

@@ -9,8 +9,6 @@ import 'package:crypto_desctop/data/datasource/portfolio_local_datasource.dart';
 import 'package:crypto_desctop/data/datasource/portfolio_local_datasource_impl.dart';
 import 'package:crypto_desctop/data/datasource/portfolio_remote_datasource.dart';
 import 'package:crypto_desctop/data/datasource/portfolio_remote_datasource_impl.dart';
-import 'package:crypto_desctop/data/datasource/user_local_datasource.dart';
-import 'package:crypto_desctop/data/datasource/user_local_datasource_impl.dart';
 import 'package:crypto_desctop/data/repository/auth_repository_impl.dart';
 import 'package:crypto_desctop/data/repository/coin_repository_impl.dart';
 import 'package:crypto_desctop/data/repository/portfolio_repository_impl.dart';
@@ -43,12 +41,6 @@ void setupServiceLocator(Isar isar) {
     ),
   );
 
-  // ======== USER ========
-  // reg UserLocalDatasource
-  getIt.registerSingleton<UserLocalDataSource>(
-    UserLocalDataSourceImpl(getIt<Isar>()),
-  );
-
   // ======== AUTH (Supabase) ========
   // reg AuthRemoteDataSource
   getIt.registerSingleton<AuthRemoteDataSource>(
@@ -59,7 +51,6 @@ void setupServiceLocator(Isar isar) {
   getIt.registerSingleton<AuthRepository>(
     AuthRepositoryImpl(
       remoteDataSource: getIt<AuthRemoteDataSource>(),
-      localDataSource: getIt<UserLocalDataSource>(),
     ),
   );
 

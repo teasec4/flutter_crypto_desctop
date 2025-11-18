@@ -23,24 +23,3 @@ final class PortfolioError extends PortfolioState {
 
   PortfolioError(this.message);
 }
-
-/// State emitted after successfully adding an item to portfolio
-final class PortfolioItemAdded extends PortfolioState {
-  final PortfolioItem item;
-
-  PortfolioItemAdded(this.item);
-}
-
-/// State emitted after successfully updating a portfolio item
-final class PortfolioItemUpdated extends PortfolioState {
-  final PortfolioItem item;
-
-  PortfolioItemUpdated(this.item);
-}
-
-/// State emitted after successfully removing an item from portfolio
-final class PortfolioItemRemoved extends PortfolioState {
-  final String itemId;
-
-  PortfolioItemRemoved(this.itemId);
-}

@@ -23,13 +23,21 @@ const PortfolioItemModelSchema = CollectionSchema(
       name: r'addedAt',
       type: IsarType.dateTime,
     ),
-    r'amount': PropertySchema(id: 1, name: r'amount', type: IsarType.double),
-    r'symbol': PropertySchema(id: 2, name: r'symbol', type: IsarType.string),
+    r'amount': PropertySchema(
+      id: 1,
+      name: r'amount',
+      type: IsarType.double,
+    ),
+    r'symbol': PropertySchema(
+      id: 2,
+      name: r'symbol',
+      type: IsarType.string,
+    ),
     r'userEmail': PropertySchema(
       id: 3,
       name: r'userEmail',
       type: IsarType.string,
-    ),
+    )
   },
   estimateSize: _portfolioItemModelEstimateSize,
   serialize: _portfolioItemModelSerialize,
@@ -108,16 +116,12 @@ Id _portfolioItemModelGetId(PortfolioItemModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _portfolioItemModelGetLinks(
-  PortfolioItemModel object,
-) {
+    PortfolioItemModel object) {
   return [];
 }
 
 void _portfolioItemModelAttach(
-  IsarCollection<dynamic> col,
-  Id id,
-  PortfolioItemModel object,
-) {
+    IsarCollection<dynamic> col, Id id, PortfolioItemModel object) {
   object.id = id;
 }
 
@@ -133,14 +137,17 @@ extension PortfolioItemModelQueryWhereSort
 extension PortfolioItemModelQueryWhere
     on QueryBuilder<PortfolioItemModel, PortfolioItemModel, QWhereClause> {
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterWhereClause>
-  idEqualTo(Id id) {
+      idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
+      return query.addWhereClause(IdWhereClause.between(
+        lower: id,
+        upper: id,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterWhereClause>
-  idNotEqualTo(Id id) {
+      idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -163,7 +170,7 @@ extension PortfolioItemModelQueryWhere
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterWhereClause>
-  idGreaterThan(Id id, {bool include = false}) {
+      idGreaterThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.greaterThan(lower: id, includeLower: include),
@@ -172,7 +179,7 @@ extension PortfolioItemModelQueryWhere
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterWhereClause>
-  idLessThan(Id id, {bool include = false}) {
+      idLessThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.lessThan(upper: id, includeUpper: include),
@@ -181,21 +188,19 @@ extension PortfolioItemModelQueryWhere
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterWhereClause>
-  idBetween(
+      idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.between(
-          lower: lowerId,
-          includeLower: includeLower,
-          upper: upperId,
-          includeUpper: includeUpper,
-        ),
-      );
+      return query.addWhereClause(IdWhereClause.between(
+        lower: lowerId,
+        includeLower: includeLower,
+        upper: upperId,
+        includeUpper: includeUpper,
+      ));
     });
   }
 }
@@ -203,111 +208,109 @@ extension PortfolioItemModelQueryWhere
 extension PortfolioItemModelQueryFilter
     on QueryBuilder<PortfolioItemModel, PortfolioItemModel, QFilterCondition> {
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  addedAtEqualTo(DateTime value) {
+      addedAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'addedAt', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'addedAt',
+        value: value,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  addedAtGreaterThan(DateTime value, {bool include = false}) {
+      addedAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'addedAt',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'addedAt',
+        value: value,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  addedAtLessThan(DateTime value, {bool include = false}) {
+      addedAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'addedAt',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'addedAt',
+        value: value,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  addedAtBetween(
+      addedAtBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'addedAt',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'addedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  amountEqualTo(double value, {double epsilon = Query.epsilon}) {
+      amountEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'amount',
-          value: value,
-          epsilon: epsilon,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'amount',
+        value: value,
+        epsilon: epsilon,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  amountGreaterThan(
+      amountGreaterThan(
     double value, {
     bool include = false,
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'amount',
-          value: value,
-          epsilon: epsilon,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'amount',
+        value: value,
+        epsilon: epsilon,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  amountLessThan(
+      amountLessThan(
     double value, {
     bool include = false,
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'amount',
-          value: value,
-          epsilon: epsilon,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'amount',
+        value: value,
+        epsilon: epsilon,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  amountBetween(
+      amountBetween(
     double lower,
     double upper, {
     bool includeLower = true,
@@ -315,143 +318,139 @@ extension PortfolioItemModelQueryFilter
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'amount',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          epsilon: epsilon,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'amount',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  idIsNull() {
+      idIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'id'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  idIsNotNull() {
+      idIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'id'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  idEqualTo(Id? value) {
+      idEqualTo(Id? value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'id', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: value,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  idGreaterThan(Id? value, {bool include = false}) {
+      idGreaterThan(
+    Id? value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'id',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  idLessThan(Id? value, {bool include = false}) {
+      idLessThan(
+    Id? value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'id',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  idBetween(
+      idBetween(
     Id? lower,
     Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'id',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolEqualTo(String value, {bool caseSensitive = true}) {
+      symbolEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'symbol',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'symbol',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolGreaterThan(
+      symbolGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'symbol',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'symbol',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolLessThan(
+      symbolLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'symbol',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'symbol',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolBetween(
+      symbolBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -459,140 +458,135 @@ extension PortfolioItemModelQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'symbol',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'symbol',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolStartsWith(String value, {bool caseSensitive = true}) {
+      symbolStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'symbol',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'symbol',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolEndsWith(String value, {bool caseSensitive = true}) {
+      symbolEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'symbol',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'symbol',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolContains(String value, {bool caseSensitive = true}) {
+      symbolContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'symbol',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'symbol',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolMatches(String pattern, {bool caseSensitive = true}) {
+      symbolMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'symbol',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'symbol',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolIsEmpty() {
+      symbolIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'symbol', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'symbol',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  symbolIsNotEmpty() {
+      symbolIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'symbol', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'symbol',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailEqualTo(String value, {bool caseSensitive = true}) {
+      userEmailEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'userEmail',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userEmail',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailGreaterThan(
+      userEmailGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'userEmail',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'userEmail',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailLessThan(
+      userEmailLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'userEmail',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'userEmail',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailBetween(
+      userEmailBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -600,86 +594,84 @@ extension PortfolioItemModelQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'userEmail',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'userEmail',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailStartsWith(String value, {bool caseSensitive = true}) {
+      userEmailStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'userEmail',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'userEmail',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailEndsWith(String value, {bool caseSensitive = true}) {
+      userEmailEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'userEmail',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'userEmail',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailContains(String value, {bool caseSensitive = true}) {
+      userEmailContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'userEmail',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'userEmail',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailMatches(String pattern, {bool caseSensitive = true}) {
+      userEmailMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'userEmail',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'userEmail',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailIsEmpty() {
+      userEmailIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'userEmail', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userEmail',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterFilterCondition>
-  userEmailIsNotEmpty() {
+      userEmailIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'userEmail', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'userEmail',
+        value: '',
+      ));
     });
   }
 }
@@ -693,56 +685,56 @@ extension PortfolioItemModelQueryLinks
 extension PortfolioItemModelQuerySortBy
     on QueryBuilder<PortfolioItemModel, PortfolioItemModel, QSortBy> {
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortByAddedAt() {
+      sortByAddedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'addedAt', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortByAddedAtDesc() {
+      sortByAddedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'addedAt', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortByAmount() {
+      sortByAmount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amount', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortByAmountDesc() {
+      sortByAmountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amount', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortBySymbol() {
+      sortBySymbol() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'symbol', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortBySymbolDesc() {
+      sortBySymbolDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'symbol', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortByUserEmail() {
+      sortByUserEmail() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'userEmail', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  sortByUserEmailDesc() {
+      sortByUserEmailDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'userEmail', Sort.desc);
     });
@@ -752,70 +744,70 @@ extension PortfolioItemModelQuerySortBy
 extension PortfolioItemModelQuerySortThenBy
     on QueryBuilder<PortfolioItemModel, PortfolioItemModel, QSortThenBy> {
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByAddedAt() {
+      thenByAddedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'addedAt', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByAddedAtDesc() {
+      thenByAddedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'addedAt', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByAmount() {
+      thenByAmount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amount', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByAmountDesc() {
+      thenByAmountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amount', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenById() {
+      thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByIdDesc() {
+      thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenBySymbol() {
+      thenBySymbol() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'symbol', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenBySymbolDesc() {
+      thenBySymbolDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'symbol', Sort.desc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByUserEmail() {
+      thenByUserEmail() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'userEmail', Sort.asc);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QAfterSortBy>
-  thenByUserEmailDesc() {
+      thenByUserEmailDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'userEmail', Sort.desc);
     });
@@ -825,28 +817,28 @@ extension PortfolioItemModelQuerySortThenBy
 extension PortfolioItemModelQueryWhereDistinct
     on QueryBuilder<PortfolioItemModel, PortfolioItemModel, QDistinct> {
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QDistinct>
-  distinctByAddedAt() {
+      distinctByAddedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'addedAt');
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QDistinct>
-  distinctByAmount() {
+      distinctByAmount() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'amount');
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QDistinct>
-  distinctBySymbol({bool caseSensitive = true}) {
+      distinctBySymbol({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'symbol', caseSensitive: caseSensitive);
     });
   }
 
   QueryBuilder<PortfolioItemModel, PortfolioItemModel, QDistinct>
-  distinctByUserEmail({bool caseSensitive = true}) {
+      distinctByUserEmail({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'userEmail', caseSensitive: caseSensitive);
     });
@@ -862,7 +854,7 @@ extension PortfolioItemModelQueryProperty
   }
 
   QueryBuilder<PortfolioItemModel, DateTime, QQueryOperations>
-  addedAtProperty() {
+      addedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'addedAt');
     });
@@ -881,7 +873,7 @@ extension PortfolioItemModelQueryProperty
   }
 
   QueryBuilder<PortfolioItemModel, String, QQueryOperations>
-  userEmailProperty() {
+      userEmailProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'userEmail');
     });

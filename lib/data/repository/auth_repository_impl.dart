@@ -1,24 +1,19 @@
 import 'package:crypto_desctop/data/datasource/auth_remote_datasource.dart';
-import 'package:crypto_desctop/data/datasource/user_local_datasource.dart';
 import 'package:crypto_desctop/domain/models/user_model.dart';
 import 'package:crypto_desctop/domain/repository/auth_repo.dart';
 
 /// Реализация Auth Repository
-/// Координирует работу между Firebase (remote) и Isar (local)
+/// Координирует работу с удаленной аутентификацией
 ///
 /// Flow:
-/// 1. Пользователь логинится через Firebase
-/// 2. Получаем User данные из Firebase
-/// 3. Сохраняем email и user info локально в Isar
-/// 4. При следующем запуске - проверяем Isar БД по email
-/// 5. Ассеты привязаны к email в Isar
+/// 1. Пользователь логинится через Supabase
+/// 2. Получаем User данные из Supabase
+/// 3. Данные юзера получаются всегда из сети (не кешируются локально)
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
-  final UserLocalDataSource localDataSource;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
-    required this.localDataSource,
   });
 
   @override
@@ -27,34 +22,21 @@ class AuthRepositoryImpl implements AuthRepository {
     String password,
     String displayName,
   ) async {
-    final remoteDbUser = await remoteDataSource.register(
+    return await remoteDataSource.register(
       email,
       password,
       displayName,
     );
-    await localDataSource.saveUser(remoteDbUser);
-    return remoteDbUser;
   }
 
   @override
   Future<User> login(String email, String password) async {
-    final remoteDbUser = await remoteDataSource.login(email, password);
-    await localDataSource.saveUser(remoteDbUser);
-    return remoteDbUser;
+    return await remoteDataSource.login(email, password);
   }
 
   @override
   Future<void> logout() async {
-    // Get current user before logout to delete from local storage
-    final currentUser = await remoteDataSource.getCurrentUser();
-
-    // Sign out from Firebase
     await remoteDataSource.logout();
-
-    // Delete user from local storage if exists
-    if (currentUser != null) {
-      await localDataSource.deleteUser(currentUser.id);
-    }
   }
 
   @override

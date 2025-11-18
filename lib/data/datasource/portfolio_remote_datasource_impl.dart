@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show TimeoutException;
 import 'dart:developer' as developer;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:crypto_desctop/core/constants/app_constants.dart';

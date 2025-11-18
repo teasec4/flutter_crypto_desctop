@@ -3,7 +3,6 @@ import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/core/theme/app_theme.dart';
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
 import 'package:crypto_desctop/data/models/isar_coin_model.dart';
-import 'package:crypto_desctop/data/models/isar_user_model.dart';
 import 'package:crypto_desctop/data/models/portfolio_item_model.dart';
 import 'package:crypto_desctop/di/service_locator.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
@@ -31,8 +30,7 @@ void main() async {
     // init Supabase
     await Supabase.initialize(
       url: dotenv.env['SUPABASE_URL'] ?? '',
-      anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1Y3V3ZGtjdHN1ZnF4Z3Nwb3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyNzc3MjUsImV4cCI6MjA3ODg1MzcyNX0.ynPRHsCLH9bvUIwkFRjRZX5ad6ntQwAdvbkJNMyhHaA',
+      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? ''
     );
 
     // init Isar
@@ -44,7 +42,6 @@ void main() async {
 
     final isar = await Isar.open([
       IsarCoinSchema,
-      IsarUserSchema,
       PortfolioItemModelSchema,
     ], directory: isarDir.path);
 
@@ -84,6 +81,8 @@ class MyApp extends StatelessWidget {
           create: (context) {
             final portfolioCubit = context.read<PortfolioCubit>();
             final coinCubit = context.read<CoinCubit>();
+            // AuthCubit(AuthRepository authRepository)
+            // getIt() → getIt<AuthRepository>() → instance of AuthRepositoryImpl
             final authCubit = AuthCubit(getIt());
 
             // Set portfolio and coin cubit references BEFORE calling any methods
@@ -111,7 +110,6 @@ class MyApp extends StatelessWidget {
             themeMode: themeState is ThemeDark
                 ? ThemeMode.dark
                 : ThemeMode.light,
-            // home: const HomePage(),
           );
         },
       ),
