@@ -284,28 +284,62 @@ class _HomePageState extends State<HomePage> {
       child: SafeArea(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Text(
+                    'Crypto App',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Your crypto portfolio',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                ],
+              ),
+            ),
             Expanded(
               child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 children: [
-                  ListTile(
-                    title: const Text("Home"),
-                    selected: selectedIndex == 0,
+                  _buildNavItem(
+                    context,
+                    title: 'Home',
+                    icon: Icons.home_rounded,
+                    selectedIcon: Icons.home,
+                    isSelected: selectedIndex == 0,
                     onTap: () {
                       context.go(AppConstants.homeRoute);
                       Navigator.of(context).pop();
                     },
                   ),
-                  ListTile(
-                    title: const Text("Portfolio"),
-                    selected: selectedIndex == 1,
+                  const SizedBox(height: 8),
+                  _buildNavItem(
+                    context,
+                    title: 'Portfolio',
+                    icon: Icons.pie_chart_outline,
+                    selectedIcon: Icons.pie_chart,
+                    isSelected: selectedIndex == 1,
                     onTap: () {
                       context.go(AppConstants.portfolioRoute);
                       Navigator.of(context).pop();
                     },
                   ),
-                  ListTile(
-                    title: const Text("Settings"),
-                    selected: selectedIndex == 2,
+                  const SizedBox(height: 8),
+                  _buildNavItem(
+                    context,
+                    title: 'Settings',
+                    icon: Icons.settings_outlined,
+                    selectedIcon: Icons.settings,
+                    isSelected: selectedIndex == 2,
                     onTap: () {
                       context.go(AppConstants.settingsRoute);
                       Navigator.of(context).pop();
@@ -422,6 +456,68 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required IconData selectedIcon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: isSelected
+                ? colorScheme.primary.withValues(alpha: 0.15)
+                : Colors.transparent,
+            border: isSelected
+                ? Border.all(
+                    color: colorScheme.primary.withValues(alpha: 0.3),
+                    width: 1.5,
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isSelected ? selectedIcon : icon,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected
+                        ? colorScheme.primary
+                        : colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check_circle,
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+            ],
+          ),
         ),
       ),
     );

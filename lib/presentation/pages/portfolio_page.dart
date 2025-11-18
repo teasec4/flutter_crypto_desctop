@@ -30,145 +30,16 @@ class PortfolioPage extends StatelessWidget {
       },
       child: BlocBuilder<PortfolioCubit, PortfolioState>(
         builder: (context, state) {
+          // Get items and loading state
+          List<PortfolioItem> items = [];
+          bool isLoading = false;
+          
           if (state is PortfolioLoading) {
-            return const Center(child: CircularProgressIndicator());
+            items = state.items;
+            isLoading = true;
           } else if (state is PortfolioLoaded) {
-            // Handle empty portfolio safely
-            if (state.items.isEmpty) {
-              return _buildEmptyPortfolio(context);
-            }
-
-            // Calculate total portfolio value
-            double totalValue = 0;
-            for (var item in state.items) {
-              // Validate item data
-              if (item.totalValue.isNaN || item.totalValue.isInfinite) {
-                continue;
-              }
-              totalValue += item.totalValue;
-            }
-
-            // Validate total value
-            if (totalValue.isNaN || totalValue.isInfinite) {
-              totalValue = 0;
-            }
-
-            return RefreshIndicator(
-              onRefresh: () =>
-                  context.read<PortfolioCubit>().refreshPortfolio(),
-              child: Column(
-                children: [
-                  // Total portfolio value - Apple style card
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width > 350
-                          ? 350
-                          : double.infinity,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Theme.of(context).colorScheme.primary,
-                              Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.8),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Portfolio Balance',
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary
-                                        .withValues(alpha: 0.7),
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '\$${totalValue.toStringAsFixed(2)}',
-                              style: Theme.of(context).textTheme.displayMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onPrimary,
-                                  ),
-                            ),
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onPrimary.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                '${state.items.length} assets',
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onPrimary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Portfolio items list - Apple style minimal
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      itemCount: state.items.length,
-                      itemBuilder: (context, index) {
-                        // Safely access items with bounds checking
-                        if (index >= state.items.length) {
-                          return const SizedBox();
-                        }
-                        final item = state.items[index];
-                        // Validate item before building
-                        if (_isValidPortfolioItem(item)) {
-                          return _buildPortfolioTile(context, item, totalValue);
-                        }
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
+            items = state.items;
+            isLoading = false;
           } else if (state is PortfolioError) {
             return Center(
               child: Column(
@@ -185,7 +56,154 @@ class PortfolioPage extends StatelessWidget {
               ),
             );
           }
-          return const SizedBox();
+          
+          // Show empty portfolio if no items
+          if (items.isEmpty) {
+            return _buildEmptyPortfolio(context);
+          }
+
+          // Calculate total portfolio value
+          double totalValue = 0;
+          for (var item in items) {
+            if (item.totalValue.isNaN || item.totalValue.isInfinite) {
+              continue;
+            }
+            totalValue += item.totalValue;
+          }
+
+          // Validate total value
+          if (totalValue.isNaN || totalValue.isInfinite) {
+            totalValue = 0;
+          }
+
+          return Stack(
+            children: [
+              RefreshIndicator(
+                onRefresh: () =>
+                    context.read<PortfolioCubit>().refreshPortfolio(),
+                child: Column(
+                  children: [
+                    // Total portfolio value - Apple style card
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width > 350
+                            ? 350
+                            : double.infinity,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Theme.of(context).colorScheme.primary,
+                                Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.8),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.3),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Portfolio Balance',
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary
+                                          .withValues(alpha: 0.7),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '\$${totalValue.toStringAsFixed(2)}',
+                                style: Theme.of(context).textTheme.displayMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                    ),
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${items.length} assets',
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Portfolio items list - Apple style minimal
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          if (index >= items.length) {
+                            return const SizedBox();
+                          }
+                          final item = items[index];
+                          if (_isValidPortfolioItem(item)) {
+                            return _buildPortfolioTile(context, item, totalValue);
+                          }
+                          return const SizedBox();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Loading overlay
+              if (isLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
+            ],
+          );
         },
       ),
     );

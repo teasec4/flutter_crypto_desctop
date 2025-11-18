@@ -8,7 +8,11 @@ sealed class PortfolioState {}
 final class PortfolioInitial extends PortfolioState {}
 
 /// Loading state while fetching portfolio data
-final class PortfolioLoading extends PortfolioState {}
+final class PortfolioLoading extends PortfolioState {
+  final List<PortfolioItem> items;
+  
+  PortfolioLoading(this.items);
+}
 
 /// State when portfolio items have been successfully loaded
 final class PortfolioLoaded extends PortfolioState {

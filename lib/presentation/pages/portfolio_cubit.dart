@@ -109,7 +109,10 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     try {
       // Only show loading if explicitly requested
       if (showLoading) {
-        emit(PortfolioLoading());
+        final previousItems = (state is PortfolioLoaded)
+            ? (state as PortfolioLoaded).items
+            : <PortfolioItem>[];
+        emit(PortfolioLoading(previousItems));
       }
 
       // Use fresh fetch if explicitly requested (manual refresh)
