@@ -69,11 +69,11 @@ class _CoinChartWidgetState extends State<CoinChartWidget> {
         ),
         const SizedBox(height: 16),
 
-        // Time range selector
+        // Time range selector - centered
         SizedBox(
           height: 40,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _TimeButton(
                 label: '1D',
@@ -270,9 +270,11 @@ class _TimeButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
-        foregroundColor: isSelected ? Colors.white : Colors.black,
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+        foregroundColor: isSelected
+            ? Theme.of(context).colorScheme.onPrimary
+            : Theme.of(context).colorScheme.onSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 16),
       ),
