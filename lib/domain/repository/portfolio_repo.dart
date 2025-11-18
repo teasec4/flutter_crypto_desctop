@@ -21,7 +21,4 @@ abstract class PortfolioRepository {
 
   /// Удалить asset из portfolio
   Future<void> removePortfolioItem(String userEmail, String itemId);
-
-  /// Удалить все assets пользователя (при logout)
-  Future<void> clearUserPortfolio(String userEmail);
 }

@@ -16,7 +16,4 @@ abstract class AuthRemoteDataSource {
 
   /// Проверить, авторизован ли пользователь
   Future<bool> isUserLoggedIn();
-
-  /// Получить текущий Firebase UID
-  Future<String?> getCurrentUserId();
 }

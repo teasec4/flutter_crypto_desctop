@@ -17,6 +17,7 @@ class PortfolioCubit extends Cubit<PortfolioState> {
   final CoinRepo coinRepo;
   String _currentUserEmail = ''; // Initialize as empty string, never null
   Timer? _autoRefreshTimer;
+  bool _isLoadingPortfolio = false; // Prevent concurrent portfolio loads
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
   PortfolioCubit({required this.portfolioRepository, required this.coinRepo})
@@ -49,14 +50,13 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     developer.log('PortfolioCubit: loadPortfolioInitial called');
     _currentUserEmail = userEmail;
 
-    // Start auto-refresh timer when data is loaded
-    _startAutoRefreshTimer();
-
-    // Try to load from cache first
+    // Don't start auto-refresh yet - it will start after first load completes
+    // Try to load from cache first (quick display)
     await _loadPortfolioFromCache(userEmail);
 
     // Then load from network fresh (with loading indicator)
-    // Use forceFresh=true to get actual fresh data from server, not cache again
+    // Use forceFresh=true to get actual fresh data from server
+    // This will also start auto-refresh timer when completed
     await _loadPortfolioNetwork(
       showLoading: true,
       userEmail: userEmail,
@@ -96,6 +96,16 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       return;
     }
 
+    // Prevent concurrent loads to avoid race conditions and duplicate items
+    if (_isLoadingPortfolio) {
+      developer.log('PortfolioCubit: Load already in progress, skipping');
+      return;
+    }
+
+    _isLoadingPortfolio = true;
+    // Cancel auto-refresh during manual load to prevent background sync interference
+    _autoRefreshTimer?.cancel();
+
     try {
       // Only show loading if explicitly requested
       if (showLoading) {
@@ -127,6 +137,10 @@ class PortfolioCubit extends Cubit<PortfolioState> {
         // If we have cached data, keep showing it (silent error)
         developer.log('PortfolioCubit: Network failed but keeping cached data');
       }
+    } finally {
+      _isLoadingPortfolio = false;
+      // Restart auto-refresh timer after load completes
+      _startAutoRefreshTimer();
     }
   }
 
@@ -261,22 +275,5 @@ class PortfolioCubit extends Cubit<PortfolioState> {
     emit(PortfolioInitial());
     developer.log('PortfolioCubit: Cleared');
   }
-
-  /// Delete entire portfolio from server (called when user explicitly wants to clear it)
-  Future<void> clearPortfolio() async {
-    if (_currentUserEmail.isEmpty) {
-      emit(PortfolioInitial());
-      return;
-    }
-
-    try {
-      await portfolioRepository.clearUserPortfolio(_currentUserEmail);
-      _currentUserEmail = '';
-      _autoRefreshTimer?.cancel();
-      _autoRefreshTimer = null;
-      emit(PortfolioInitial());
-    } catch (e) {
-      emit(PortfolioError('Failed to clear portfolio: ${e.toString()}'));
-    }
-  }
+  
 }

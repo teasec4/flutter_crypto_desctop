@@ -16,7 +16,4 @@ abstract class PortfolioRemoteDataSource {
 
   /// Удалить asset из Firestore portfolio
   Future<void> removePortfolioItem(String userEmail, String itemId);
-
-  /// Удалить всё portfolio пользователя
-  Future<void> clearUserPortfolio(String userEmail);
 }

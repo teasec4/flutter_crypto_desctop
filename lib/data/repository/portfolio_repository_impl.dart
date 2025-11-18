@@ -117,11 +117,4 @@ class PortfolioRepositoryImpl implements PortfolioRepository {
     // Clear cache to force refresh on next load
     await localDataSource.clearPortfolioItems(userEmail);
   }
-
-  @override
-  Future<void> clearUserPortfolio(String userEmail) async {
-    await remoteDataSource.clearUserPortfolio(userEmail);
-    // Clear cache
-    await localDataSource.clearPortfolioItems(userEmail);
-  }
 }

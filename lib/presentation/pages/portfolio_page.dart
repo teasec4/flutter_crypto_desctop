@@ -39,74 +39,77 @@ class PortfolioPage extends StatelessWidget {
             onRefresh: () => context.read<PortfolioCubit>().refreshPortfolio(),
             child: Column(
               children: [
-                // Total portfolio value header card
+                // Total portfolio value - Apple style card
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.1),
-                          Theme.of(
-                            context,
-                          ).colorScheme.secondary.withValues(alpha: 0.05),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Portfolio Balance',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width > 350
+                      ? 350
+                      : double.infinity,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Portfolio Balance',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w500,
+                                fontSize: 12,
                               ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          '\$${totalValue.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.displaySmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '${state.items.length} assets',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: Colors.green.shade500,
-                                  fontWeight: FontWeight.bold,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '\$${totalValue.toStringAsFixed(2)}',
+                              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${state.items.length} assets',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
                                 ),
-                          ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                // Portfolio items list
+                // Portfolio items list - Apple style minimal
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(
@@ -152,7 +155,7 @@ class PortfolioPage extends StatelessWidget {
     );
   }
 
-  /// Builds a tile widget for a single portfolio item
+  /// Builds a tile widget for a single portfolio item - Apple style minimal
   Widget _buildPortfolioTile(
     BuildContext context,
     PortfolioItem item,
@@ -163,112 +166,100 @@ class PortfolioPage extends StatelessWidget {
         : 0.0;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Container(
-        decoration: BoxDecoration(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showEditPortfolioModal(context, item),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(
-              context,
-            ).colorScheme.outline.withValues(alpha: 0.15),
-          ),
-          color: Theme.of(context).colorScheme.surface,
-        ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-          // Cryptocurrency icon
-          leading: Container(
-            width: 48,
-            height: 48,
+          child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
-            ),
-            child: item.imageUrl != null
-                ? Image.network(
-                    item.imageUrl!,
-                    width: 40,
-                    height: 40,
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.currency_bitcoin, size: 24),
-                  )
-                : const Icon(Icons.currency_bitcoin, size: 24),
-          ),
-          // Coin symbol
-          title: Text(
-            item.symbol,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          // Coin name and amount held
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              if (item.name != null)
-                Text(
-                  item.name!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: UIUtils.getSecondaryTextColor(context),
-                  ),
-                ),
-              const SizedBox(height: 4),
-              Text(
-                '${item.amount.toStringAsFixed(4)} ${item.symbol}',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: UIUtils.getSecondaryTextColor(context),
-                  fontWeight: FontWeight.w600,
-                ),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
               ),
-            ],
-          ),
-          // Total value and percentage
-          trailing: SizedBox(
-            width: 140,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
               children: [
-                // Total holding value
-                Text(
-                  '\$${item.totalValue.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade500,
+                // Cryptocurrency icon - smaller
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                  ),
+                  child: item.imageUrl != null
+                      ? Image.network(
+                          item.imageUrl!,
+                          width: 32,
+                          height: 32,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.currency_bitcoin, size: 20),
+                        )
+                      : const Icon(Icons.currency_bitcoin, size: 20),
+                ),
+                const SizedBox(width: 12),
+                // Coin symbol and amount
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.symbol,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${item.amount.toStringAsFixed(4)} ${item.symbol}',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: UIUtils.getSecondaryTextColor(context),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 6),
-                // Percentage of portfolio
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${percentage.toStringAsFixed(1)}%',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
+                const SizedBox(width: 8),
+                // Total value and percentage - right side
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '\$${item.totalValue.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        '${percentage.toStringAsFixed(1)}%',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          // Tap to open edit/delete modal
-          onTap: () => _showEditPortfolioModal(context, item),
         ),
       ),
     );

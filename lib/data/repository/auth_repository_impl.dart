@@ -66,9 +66,4 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<User?> getCurrentUser() async {
     return await remoteDataSource.getCurrentUser();
   }
-
-  @override
-  Future<String?> getCurrentUserId() async {
-    return await remoteDataSource.getCurrentUserId();
-  }
 }

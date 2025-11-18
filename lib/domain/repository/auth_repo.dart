@@ -16,7 +16,4 @@ abstract class AuthRepository {
 
   /// Получить текущего авторизованного пользователя
   Future<User?> getCurrentUser();
-
-  /// Получить текущий Supabase UID
-  Future<String?> getCurrentUserId();
 }

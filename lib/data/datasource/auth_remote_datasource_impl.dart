@@ -172,13 +172,4 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return false;
     }
   }
-
-  @override
-  Future<String?> getCurrentUserId() async {
-    try {
-      return _supabase.auth.currentUser?.id;
-    } catch (e) {
-      return null;
-    }
-  }
 }

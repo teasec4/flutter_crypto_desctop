@@ -200,29 +200,4 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
     }
   }
 
-  @override
-  Future<void> clearUserPortfolio(String userEmail) async {
-    try {
-      final userId = _supabase.auth.currentUser?.id;
-      if (userId == null) {
-        throw Exception('User not authenticated');
-      }
-
-      await _supabase
-          .from(AppConstants.portfolioTable)
-          .delete()
-          .eq('user_id', userId)
-          .timeout(
-            AppConstants.networkTimeout,
-            onTimeout: () {
-              throw TimeoutException(
-                'Timeout while clearing portfolio after ${AppConstants.networkTimeout.inSeconds}s',
-              );
-            },
-          );
-    } catch (e) {
-      developer.log('PortfolioRemoteDataSource: clearUserPortfolio error: $e');
-      throw Exception('Failed to clear portfolio: ${e.toString()}');
-    }
-  }
 }
