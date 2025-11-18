@@ -39,13 +39,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         createdAt: DateTime.now(),
       );
 
-      // Save user profile to users table
+      // Save user profile to profiles table
       try {
-        await _supabase.from('profiles').insert({
-          'id': user.id,
-          'email': user.email,
-          'display_name': user.displayName,
-          'created_at': user.createdAt.toIso8601String(),
+        await _supabase.from(AppConstants.profilesTable).insert({
+          AppConstants.id: user.id,
+          AppConstants.email: user.email,
+          AppConstants.displayName: user.displayName,
+          AppConstants.createdAt: user.createdAt.toIso8601String(),
         });
       } catch (e) {
         developer.log('Error saving to profiles table: $e');

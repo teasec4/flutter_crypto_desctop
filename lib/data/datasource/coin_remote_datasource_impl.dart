@@ -1,90 +1,92 @@
-import 'dart:isolate';
-import 'package:crypto_desctop/core/isolate/worker_isolate.dart';
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/data/datasource/coin_remote_datasource.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:crypto_desctop/domain/models/coin_chart_data.dart';
+import 'package:http/http.dart' as http;
 
-/// Implementation of CoinRemoteDatasource using isolates for background processing
+/// Implementation of CoinRemoteDatasource using direct HTTP requests
 class CoinRemoteDatasourceImpl implements CoinRemoteDatasource {
-  // Send port for communicating with the worker isolate
-  SendPort? _workerSendPort;
-
-  /// Initializes the worker isolate for background coin fetching
-  /// Creates a one-way connection to avoid blocking the main thread
-  Future<void> _initializeWorker() async {
-    if (_workerSendPort != null) return;
-    // Create a receive port in the main isolate
-    final receivePort = ReceivePort();
-    // Spawn worker isolate and establish communication
-    await Isolate.spawn(coinWorker, receivePort.sendPort);
-    // Get the send port from the worker to send messages
-    _workerSendPort = await receivePort.first as SendPort;
-  }
+  static const Duration _timeout = Duration(seconds: 15);
 
   @override
   Future<List<Coin>> getCoins({int page = 1, int perPage = 100}) async {
-    await _initializeWorker();
+    try {
+      final url = Uri.parse(
+        '${AppConstants.coinGeckoBaseUrl}${AppConstants.coinGeckoMarketsEndpoint}'
+        '?vs_currency=usd&order=market_cap_desc'
+        '&per_page=$perPage&page=$page&sparkline=false',
+      );
 
-    final receivePort = ReceivePort();
-    _workerSendPort!.send({
-      'page': page,
-      'perPage': perPage,
-      'sendPort': receivePort.sendPort,
-    });
+      final response = await http
+          .get(url)
+          .timeout(_timeout, onTimeout: () => throw TimeoutException(
+                'Request timeout after ${_timeout.inSeconds}s',
+              ));
 
-    final rawList = await receivePort.first;
-
-    if (rawList is Map && rawList.containsKey('error')) {
-      throw Exception('Failed to fetch coins: ${rawList['error']}');
+      if (response.statusCode == 200) {
+        final rawList = json.decode(response.body) as List;
+        return rawList.map((json) => Coin.fromJson(json)).toList();
+      } else {
+        throw Exception(
+          'HTTP ${response.statusCode}: ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch coins: $e');
     }
-
-    return (rawList as List).map((json) => Coin.fromJson(json)).toList();
   }
 
   @override
   Future<CoinChartData> getCoinChartData(String coinId, {int days = 30}) async {
-    await _initializeWorker();
+    try {
+      final url = Uri.parse(
+        '${AppConstants.coinGeckoBaseUrl}${AppConstants.coinGeckoChartEndpoint.replaceFirst('{id}', coinId)}'
+        '?vs_currency=usd&days=$days&interval=daily',
+      );
 
-    final receivePort = ReceivePort();
-    _workerSendPort!.send({
-      'coinId': coinId,
-      'days': days,
-      'sendPort': receivePort.sendPort,
-    });
+      final response = await http
+          .get(url)
+          .timeout(_timeout, onTimeout: () => throw TimeoutException(
+                'Request timeout after ${_timeout.inSeconds}s',
+              ));
 
-    final response = await receivePort.first;
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
 
-    if (response is Map && response.containsKey('error')) {
-      throw Exception('Failed to fetch chart data: ${response['error']}');
+        // Parse the prices array and extract data points
+        final prices = (data['prices'] as List).cast<List>();
+        final dataPoints = prices
+            .map((price) => ChartDataPoint.fromList(price))
+            .toList();
+
+        // Calculate min and max prices
+        double minPrice = double.infinity;
+        double maxPrice = double.negativeInfinity;
+
+        for (final point in dataPoints) {
+          if (point.price < minPrice) minPrice = point.price;
+          if (point.price > maxPrice) maxPrice = point.price;
+        }
+
+        final currentPrice = dataPoints.isNotEmpty ? dataPoints.last.price : 0.0;
+
+        return CoinChartData(
+          coinId: coinId,
+          dataPoints: dataPoints,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          currentPrice: currentPrice,
+        );
+      } else {
+        throw Exception(
+          'HTTP ${response.statusCode}: ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch chart data: $e');
     }
-
-    if (response is! Map<String, dynamic>) {
-      throw Exception('Invalid chart data format');
-    }
-
-    // Parse the prices array and extract data points
-    final prices = (response['prices'] as List).cast<List>();
-    final dataPoints = prices
-        .map((price) => ChartDataPoint.fromList(price))
-        .toList();
-
-    // Calculate min and max prices
-    double minPrice = double.infinity;
-    double maxPrice = double.negativeInfinity;
-
-    for (final point in dataPoints) {
-      if (point.price < minPrice) minPrice = point.price;
-      if (point.price > maxPrice) maxPrice = point.price;
-    }
-
-    final currentPrice = dataPoints.isNotEmpty ? dataPoints.last.price : 0.0;
-
-    return CoinChartData(
-      coinId: coinId,
-      dataPoints: dataPoints,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-      currentPrice: currentPrice,
-    );
   }
 }

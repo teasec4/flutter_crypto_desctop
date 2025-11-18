@@ -282,6 +282,3 @@ AuthFailure         (all)                 Redirect to /login
 
 ---
 
-**Visual Guide:** Clear state transitions  
-**Status:** Complete ✓  
-**Updated:** November 17, 2025

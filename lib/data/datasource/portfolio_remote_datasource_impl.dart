@@ -22,7 +22,7 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       final response = await _supabase
           .from(AppConstants.portfolioTable)
           .select()
-          .eq('user_id', userId)
+          .eq(AppConstants.userId, userId)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () {
@@ -54,11 +54,11 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       );
 
       // First, check if this symbol already exists for this user
-      final existingItem = await _supabase
-          .from(AppConstants.portfolioTable)
-          .select('id, amount')
-          .eq('symbol', item.symbol)
-          .eq('user_id', userId)
+       final existingItem = await _supabase
+           .from(AppConstants.portfolioTable)
+           .select('${AppConstants.id}, ${AppConstants.amount}')
+           .eq(AppConstants.symbol, item.symbol)
+           .eq(AppConstants.userId, userId)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () {
@@ -70,9 +70,9 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
 
       if (existingItem.isNotEmpty) {
         // Item with this symbol exists - add new amount to existing amount
-        final existingId = existingItem[0]['id'] as String;
+        final existingId = existingItem[0][AppConstants.id] as String;
         final currentAmount =
-            (existingItem[0]['amount'] as num?)?.toDouble() ?? 0.0;
+            (existingItem[0][AppConstants.amount] as num?)?.toDouble() ?? 0.0;
         final newTotalAmount = currentAmount + item.amount;
 
         developer.log(
@@ -81,9 +81,9 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
 
         await _supabase
             .from(AppConstants.portfolioTable)
-            .update({'amount': newTotalAmount})
-            .eq('id', existingId)
-            .eq('user_id', userId)
+            .update({AppConstants.amount: newTotalAmount})
+            .eq(AppConstants.id, existingId)
+            .eq(AppConstants.userId, userId)
             .timeout(
               AppConstants.networkTimeout,
               onTimeout: () {
@@ -101,10 +101,10 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
         await _supabase
             .from(AppConstants.portfolioTable)
             .insert({
-              'id': item.id,
-              'user_id': userId,
-              'symbol': item.symbol,
-              'amount': item.amount,
+              AppConstants.id: item.id,
+              AppConstants.userId: userId,
+              AppConstants.symbol: item.symbol,
+              AppConstants.amount: item.amount,
               'added_at': item.addedAt.toIso8601String(),
             })
             .timeout(
@@ -144,9 +144,9 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
 
       await _supabase
           .from(AppConstants.portfolioTable)
-          .update({'amount': newAmount})
-          .eq('id', itemId)
-          .eq('user_id', userId)
+          .update({AppConstants.amount: newAmount})
+          .eq(AppConstants.id, itemId)
+          .eq(AppConstants.userId, userId)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () {
@@ -180,8 +180,8 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       await _supabase
           .from(AppConstants.portfolioTable)
           .delete()
-          .eq('id', itemId)
-          .eq('user_id', userId)
+          .eq(AppConstants.id, itemId)
+          .eq(AppConstants.userId, userId)
           .timeout(
             AppConstants.networkTimeout,
             onTimeout: () {

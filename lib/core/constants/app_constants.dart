@@ -13,6 +13,21 @@ class AppConstants {
   static const Duration networkTimeout = Duration(seconds: 15);
   static const Duration longNetworkTimeout = Duration(seconds: 30);
 
-  // Portfolio constants
+  // Supabase tables and columns
   static const String portfolioTable = 'portfolio';
+  static const String profilesTable = 'profiles';
+  
+  // Supabase column names
+  static const String userId = 'user_id';
+  static const String id = 'id';
+  static const String amount = 'amount';
+  static const String symbol = 'symbol';
+  static const String email = 'email';
+  static const String displayName = 'display_name';
+  static const String createdAt = 'created_at';
+
+  // CoinGecko API
+  static const String coinGeckoBaseUrl = 'https://api.coingecko.com/api/v3';
+  static const String coinGeckoMarketsEndpoint = '/coins/markets';
+  static const String coinGeckoChartEndpoint = '/coins/{id}/market_chart';
 }
