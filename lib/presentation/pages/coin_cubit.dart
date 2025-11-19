@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:crypto_desctop/core/cubits/connectivity_cubit.dart';
 import 'package:crypto_desctop/domain/models/coin.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,19 +49,42 @@ class CoinUpdated extends CoinState {
 /// Only loads coins when user is authenticated for security
 class CoinCubit extends Cubit<CoinState> {
   final CoinRepo coinRepo;
+  final ConnectivityCubit connectivityCubit;
   // API max per page is 100
   static const int coinsPerPage = 100;
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
   Timer? _autoRefreshTimer;
   bool _isAuthorized = false;
+  StreamSubscription? _connectivitySubscription;
 
-  CoinCubit(this.coinRepo) : super(CoinInitial());
+  CoinCubit(this.coinRepo, this.connectivityCubit) : super(CoinInitial()) {
+    _listenToConnectivity();
+  }
 
   @override
   Future<void> close() {
     _autoRefreshTimer?.cancel();
+    _connectivitySubscription?.cancel();
     return super.close();
+  }
+
+  /// Listen to connectivity changes
+  void _listenToConnectivity() {
+    _connectivitySubscription = connectivityCubit.stream.listen((state) {
+      developer.log('CoinCubit: Connectivity state changed - ${state is ConnectivityOnline ? 'ONLINE' : 'OFFLINE'}');
+      
+      // When going online, try to refresh if we have authorized user
+      if (state is ConnectivityOnline && _isAuthorized) {
+        developer.log('CoinCubit: Back online, attempting refresh');
+        _loadCoinsNetwork(showLoading: false, forceFresh: true);
+      }
+      
+      // When going offline, don't need to do anything - just keep cached data
+      if (state is ConnectivityOffline) {
+        developer.log('CoinCubit: Gone offline, will use cached data');
+      }
+    });
   }
 
   /// Starts auto-refresh timer - updates coins every 5 minutes in background

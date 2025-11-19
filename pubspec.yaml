@@ -48,6 +48,7 @@ dependencies:
   uuid: ^4.0.0
   flutter_dotenv: ^5.1.0
   google_fonts: ^6.2.0
+  connectivity_plus: ^7.0.0
 
 
 

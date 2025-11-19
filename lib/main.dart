@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:crypto_desctop/core/cubits/connectivity_cubit.dart';
 import 'package:crypto_desctop/core/constants/app_constants.dart';
 import 'package:crypto_desctop/core/theme/app_theme.dart';
 import 'package:crypto_desctop/core/theme/theme_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:crypto_desctop/presentation/pages/auth_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/coin_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/coin_search_cubit.dart';
 import 'package:crypto_desctop/presentation/pages/portfolio_cubit.dart';
+import 'package:crypto_desctop/presentation/widgets/connectivity_banner.dart';
 import 'package:crypto_desctop/router/app_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import 'package:flutter/material.dart';
@@ -67,11 +69,12 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: themeCubit),
+        BlocProvider.value(value: getIt<ConnectivityCubit>()),
         BlocProvider(
           create: (context) {
             // Don't load coins yet - wait for auth check
             // Security: Only load coins after user is verified as authorized
-            return CoinCubit(getIt<CoinRepo>());
+            return CoinCubit(getIt<CoinRepo>(), getIt<ConnectivityCubit>());
           },
         ),
         BlocProvider(
@@ -79,8 +82,11 @@ class MyApp extends StatelessWidget {
               CoinSearchCubit(allCoins: [], coinRepo: getIt<CoinRepo>()),
         ),
         BlocProvider(
-          create: (context) =>
-              PortfolioCubit(portfolioRepository: getIt(), coinRepo: getIt()),
+          create: (context) => PortfolioCubit(
+            portfolioRepository: getIt(),
+            coinRepo: getIt(),
+            connectivityCubit: getIt<ConnectivityCubit>(),
+          ),
         ),
         BlocProvider(
           create: (context) {
@@ -115,6 +121,14 @@ class MyApp extends StatelessWidget {
             themeMode: themeState is ThemeDark
                 ? ThemeMode.dark
                 : ThemeMode.light,
+            builder: (context, child) {
+              return Column(
+                children: [
+                  const ConnectivityBanner(),
+                  Expanded(child: child ?? const SizedBox.shrink()),
+                ],
+              );
+            },
           );
         },
       ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:bloc/bloc.dart';
+import 'package:crypto_desctop/core/cubits/connectivity_cubit.dart';
 import 'package:crypto_desctop/domain/models/portfolio_item.dart';
 import 'package:crypto_desctop/domain/repository/coin_repo.dart';
 import 'package:crypto_desctop/domain/repository/portfolio_repo.dart';
@@ -15,18 +16,44 @@ part 'portfolio_state.dart';
 class PortfolioCubit extends Cubit<PortfolioState> {
   final PortfolioRepository portfolioRepository;
   final CoinRepo coinRepo;
+  final ConnectivityCubit connectivityCubit;
   String _currentUserEmail = ''; // Initialize as empty string, never null
   Timer? _autoRefreshTimer;
   bool _isLoadingPortfolio = false; // Prevent concurrent portfolio loads
+  StreamSubscription? _connectivitySubscription;
   static const Duration autoRefreshInterval = Duration(minutes: 5);
 
-  PortfolioCubit({required this.portfolioRepository, required this.coinRepo})
-    : super(PortfolioInitial());
+  PortfolioCubit({
+    required this.portfolioRepository,
+    required this.coinRepo,
+    required this.connectivityCubit,
+  }) : super(PortfolioInitial()) {
+    _listenToConnectivity();
+  }
 
   @override
   Future<void> close() {
     _autoRefreshTimer?.cancel();
+    _connectivitySubscription?.cancel();
     return super.close();
+  }
+
+  /// Listen to connectivity changes
+  void _listenToConnectivity() {
+    _connectivitySubscription = connectivityCubit.stream.listen((state) {
+      developer.log('PortfolioCubit: Connectivity state changed - ${state is ConnectivityOnline ? 'ONLINE' : 'OFFLINE'}');
+      
+      // When going online, try to refresh portfolio if user has email
+      if (state is ConnectivityOnline && _currentUserEmail.isNotEmpty) {
+        developer.log('PortfolioCubit: Back online, attempting refresh');
+        _loadPortfolioNetwork(showLoading: false, forceFresh: true);
+      }
+      
+      // When going offline, don't need to do anything - just keep cached data
+      if (state is ConnectivityOffline) {
+        developer.log('PortfolioCubit: Gone offline, will use cached data');
+      }
+    });
   }
 
   /// Starts auto-refresh timer - updates portfolio every 5 minutes in background

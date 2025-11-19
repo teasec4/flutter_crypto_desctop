@@ -1,4 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:crypto_desctop/core/cubits/connectivity_cubit.dart';
 import 'package:crypto_desctop/data/datasource/auth_remote_datasource.dart';
 import 'package:crypto_desctop/data/datasource/auth_remote_datasource_impl.dart';
 import 'package:crypto_desctop/data/datasource/coin_local_datasource.dart';
@@ -23,6 +25,11 @@ final getIt = GetIt.instance;
 void setupServiceLocator(Isar isar) {
   // reg Isar
   getIt.registerSingleton<Isar>(isar);
+
+  // ======== CONNECTIVITY ========
+  getIt.registerSingleton<ConnectivityCubit>(
+    ConnectivityCubit(connectivity: Connectivity()),
+  );
 
   // ======== COIN ========
   // reg CoinLocalDatasource
