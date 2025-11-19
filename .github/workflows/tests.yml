@@ -1,0 +1,58 @@
+name: Tests
+
+# Когда запускать workflow
+on:
+  push:
+    branches: [main, develop]  # При push в main или develop
+  pull_request:
+    branches: [main, develop]  # При PR в main или develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Запускать на Ubuntu
+    
+    steps:
+      # 1. Скачиваем код репозитория
+      - uses: actions/checkout@v3
+      
+      # 2. Кэшируем Flutter SDK (очень ускоряет!)
+      - name: Cache Flutter SDK
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.os }}-flutter-${{ hashFiles('.flutter-version') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+      
+      # 3. Устанавливаем Flutter SDK
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+          cache: true  # Встроенное кэширование
+      
+      # 4. Кэшируем pub зависимости
+      - name: Cache pub dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+      
+      # 5. Скачиваем зависимости проекта
+      - name: Get dependencies
+        run: flutter pub get
+      
+      # 6. Запускаем анализ кода (проверка ошибок)
+      - name: Run analyzer
+        run: flutter analyze
+      
+      # 7. Форматируем код (проверка что код форматирован правильно)
+      - name: Check code format
+        run: dart format --set-exit-if-changed .
+      
+      # 8. Запускаем тесты
+      - name: Run tests
+        run: flutter test
