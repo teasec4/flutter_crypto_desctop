@@ -10,7 +10,7 @@ final class PortfolioInitial extends PortfolioState {}
 /// Loading state while fetching portfolio data
 final class PortfolioLoading extends PortfolioState {
   final List<PortfolioItem> items;
-  
+
   PortfolioLoading(this.items);
 }
 

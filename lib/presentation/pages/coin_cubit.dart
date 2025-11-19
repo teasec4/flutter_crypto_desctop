@@ -72,14 +72,16 @@ class CoinCubit extends Cubit<CoinState> {
   /// Listen to connectivity changes
   void _listenToConnectivity() {
     _connectivitySubscription = connectivityCubit.stream.listen((state) {
-      developer.log('CoinCubit: Connectivity state changed - ${state is ConnectivityOnline ? 'ONLINE' : 'OFFLINE'}');
-      
+      developer.log(
+        'CoinCubit: Connectivity state changed - ${state is ConnectivityOnline ? 'ONLINE' : 'OFFLINE'}',
+      );
+
       // When going online, try to refresh if we have authorized user
       if (state is ConnectivityOnline && _isAuthorized) {
         developer.log('CoinCubit: Back online, attempting refresh');
         _loadCoinsNetwork(showLoading: false, forceFresh: true);
       }
-      
+
       // When going offline, don't need to do anything - just keep cached data
       if (state is ConnectivityOffline) {
         developer.log('CoinCubit: Gone offline, will use cached data');

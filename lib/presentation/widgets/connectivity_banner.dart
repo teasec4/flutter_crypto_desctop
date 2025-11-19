@@ -19,11 +19,7 @@ class ConnectivityBanner extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.wifi_off,
-                  color: Colors.white,
-                  size: 18,
-                ),
+                Icon(Icons.wifi_off, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
                 const Text(
                   'No Internet Connection',
@@ -37,7 +33,7 @@ class ConnectivityBanner extends StatelessWidget {
             ),
           );
         }
-        
+
         // No banner when online
         return const SizedBox.shrink();
       },

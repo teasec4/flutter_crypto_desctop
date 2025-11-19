@@ -15,33 +15,38 @@ class ConnectivityOffline extends ConnectivityState {}
 /// Listens to connectivity changes and notifies all cubits
 class ConnectivityCubit extends Cubit<ConnectivityState> {
   final Connectivity _connectivity;
-  
+
   ConnectivityCubit({Connectivity? connectivity})
-      : _connectivity = connectivity ?? Connectivity(),
-        super(ConnectivityOnline()) {
+    : _connectivity = connectivity ?? Connectivity(),
+      super(ConnectivityOnline()) {
     _initConnectivity();
   }
 
   /// Initialize connectivity monitoring
   void _initConnectivity() {
     _checkConnectivity();
-    
+
     // Listen to connectivity changes
-    _connectivity.onConnectivityChanged.listen((result) {
-      developer.log('ConnectivityCubit: Connectivity changed to $result');
-      _checkConnectivity();
-    }).onError((error) {
-      developer.log('ConnectivityCubit: Error listening to connectivity - $error');
-      // Assume offline on error
-      _updateState(false);
-    });
+    _connectivity.onConnectivityChanged
+        .listen((result) {
+          developer.log('ConnectivityCubit: Connectivity changed to $result');
+          _checkConnectivity();
+        })
+        .onError((error) {
+          developer.log(
+            'ConnectivityCubit: Error listening to connectivity - $error',
+          );
+          // Assume offline on error
+          _updateState(false);
+        });
   }
 
   /// Check current connectivity status
   Future<void> _checkConnectivity() async {
     try {
       final result = await _connectivity.checkConnectivity();
-      final isOnline = result.isNotEmpty && result.first != ConnectivityResult.none;
+      final isOnline =
+          result.isNotEmpty && result.first != ConnectivityResult.none;
       _updateState(isOnline);
     } catch (e) {
       developer.log('ConnectivityCubit: Error checking connectivity - $e');
@@ -53,10 +58,12 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
   /// Update connectivity state
   void _updateState(bool isOnline) {
     final newState = isOnline ? ConnectivityOnline() : ConnectivityOffline();
-    
+
     // Only emit if state changed
     if ((state is ConnectivityOnline) != isOnline) {
-      developer.log('ConnectivityCubit: State changed to ${isOnline ? 'ONLINE' : 'OFFLINE'}');
+      developer.log(
+        'ConnectivityCubit: State changed to ${isOnline ? 'ONLINE' : 'OFFLINE'}',
+      );
       emit(newState);
     }
   }

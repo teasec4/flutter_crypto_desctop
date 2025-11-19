@@ -41,14 +41,16 @@ class PortfolioCubit extends Cubit<PortfolioState> {
   /// Listen to connectivity changes
   void _listenToConnectivity() {
     _connectivitySubscription = connectivityCubit.stream.listen((state) {
-      developer.log('PortfolioCubit: Connectivity state changed - ${state is ConnectivityOnline ? 'ONLINE' : 'OFFLINE'}');
-      
+      developer.log(
+        'PortfolioCubit: Connectivity state changed - ${state is ConnectivityOnline ? 'ONLINE' : 'OFFLINE'}',
+      );
+
       // When going online, try to refresh portfolio if user has email
       if (state is ConnectivityOnline && _currentUserEmail.isNotEmpty) {
         developer.log('PortfolioCubit: Back online, attempting refresh');
         _loadPortfolioNetwork(showLoading: false, forceFresh: true);
       }
-      
+
       // When going offline, don't need to do anything - just keep cached data
       if (state is ConnectivityOffline) {
         developer.log('PortfolioCubit: Gone offline, will use cached data');

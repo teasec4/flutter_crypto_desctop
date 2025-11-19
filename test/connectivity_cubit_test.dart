@@ -2,7 +2,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:crypto_desctop/core/cubits/connectivity_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 class FakeConnectivity implements Connectivity {
   List<ConnectivityResult> _result = [ConnectivityResult.wifi];
   Exception? _error;
@@ -22,8 +21,7 @@ class FakeConnectivity implements Connectivity {
   }
 
   @override
-  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
-      Stream.empty();
+  Stream<List<ConnectivityResult>> get onConnectivityChanged => Stream.empty();
 }
 
 void main() {
@@ -40,7 +38,6 @@ void main() {
 
     // tearDown
     tearDown(() {
-
       connectivityCubit.close();
     });
 
@@ -78,7 +75,6 @@ void main() {
       final cubit = ConnectivityCubit(connectivity: fakeConnectivity);
       await Future.delayed(const Duration(milliseconds: 100));
 
-
       expect(cubit.isOnline, false);
 
       cubit.close();
@@ -111,4 +107,3 @@ void main() {
     });
   });
 }
-

@@ -56,9 +56,7 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context, themeState) {
                 final isDark = themeState is ThemeDark;
                 return IconButton(
-                  icon: Icon(
-                    isDark ? Icons.light_mode : Icons.dark_mode,
-                  ),
+                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
                   onPressed: () {
                     context.read<ThemeCubit>().toggleTheme();
                   },

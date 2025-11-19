@@ -33,7 +33,7 @@ class PortfolioPage extends StatelessWidget {
           // Get items and loading state
           List<PortfolioItem> items = [];
           bool isLoading = false;
-          
+
           if (state is PortfolioLoading) {
             items = state.items;
             isLoading = true;
@@ -56,7 +56,7 @@ class PortfolioPage extends StatelessWidget {
               ),
             );
           }
-          
+
           // Show empty portfolio if no items
           if (items.isEmpty) {
             return _buildEmptyPortfolio(context);
@@ -147,9 +147,8 @@ class PortfolioPage extends StatelessWidget {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary.withValues(alpha: 0.15),
+                                  color: Theme.of(context).colorScheme.onPrimary
+                                      .withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
@@ -183,7 +182,11 @@ class PortfolioPage extends StatelessWidget {
                           }
                           final item = items[index];
                           if (_isValidPortfolioItem(item)) {
-                            return _buildPortfolioTile(context, item, totalValue);
+                            return _buildPortfolioTile(
+                              context,
+                              item,
+                              totalValue,
+                            );
                           }
                           return const SizedBox();
                         },
@@ -197,9 +200,7 @@ class PortfolioPage extends StatelessWidget {
                 Positioned.fill(
                   child: Container(
                     color: Colors.black.withValues(alpha: 0.1),
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    child: const Center(child: CircularProgressIndicator()),
                   ),
                 ),
             ],
