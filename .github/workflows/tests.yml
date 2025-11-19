@@ -15,22 +15,7 @@ jobs:
       # 1. Скачиваем код репозитория
       - uses: actions/checkout@v3
       
-      # 2. Кэшируем Flutter SDK (очень ускоряет!)
-      - name: Cache Flutter SDK
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.os }}-flutter-${{ hashFiles('.flutter-version') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
-      
-      # 3. Устанавливаем Flutter SDK
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 'stable'
-          cache: true  # Встроенное кэширование
-      
-      # 4. Кэшируем pub зависимости
+      # 2. Кэшируем pub зависимости
       - name: Cache pub dependencies
         uses: actions/cache@v3
         with:
@@ -41,18 +26,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pub-
       
-      # 5. Скачиваем зависимости проекта
+      # 3. Устанавливаем Flutter SDK (stable channel)
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      
+      # 4. Скачиваем зависимости проекта
       - name: Get dependencies
         run: flutter pub get
       
-      # 6. Запускаем анализ кода (проверка ошибок)
+      # 5. Запускаем анализ кода (проверка ошибок)
       - name: Run analyzer
         run: flutter analyze
       
-      # 7. Форматируем код (проверка что код форматирован правильно)
+      # 6. Форматируем код (проверка что код форматирован правильно)
       - name: Check code format
         run: dart format --set-exit-if-changed .
       
-      # 8. Запускаем тесты
+      # 7. Запускаем тесты
       - name: Run tests
         run: flutter test
